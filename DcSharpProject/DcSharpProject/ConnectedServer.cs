@@ -16,7 +16,7 @@ namespace DcSharpProject
         public string userName { get; private set; }
         public string password { get; private set; }
 
-        public ConnectedServer
+        public ConnectedServer()
         {
 
         }
