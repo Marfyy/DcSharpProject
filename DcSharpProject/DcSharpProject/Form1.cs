@@ -14,6 +14,8 @@ namespace DcSharpProject
     {
         public Form1()
         {
+            //HALLÖ
+
             InitializeComponent();
         }
     }

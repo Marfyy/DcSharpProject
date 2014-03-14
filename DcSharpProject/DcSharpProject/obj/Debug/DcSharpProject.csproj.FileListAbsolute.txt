@@ -1,1 +1,2 @@
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.exe.config
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.exe.config
