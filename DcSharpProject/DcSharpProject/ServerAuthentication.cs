@@ -16,6 +16,9 @@ namespace DcSharpProject
         {
             return false;
         }
-        public bool logoutFromServer
+        public bool logoutFromServer(ConnectedServer server)
+        {
+            return false;
+        }
     }
 }
