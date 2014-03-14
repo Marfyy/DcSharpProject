@@ -42,10 +42,10 @@
             this.label3 = new System.Windows.Forms.Label();
             this.tabDC = new System.Windows.Forms.TabControl();
             this.tabServer = new System.Windows.Forms.TabPage();
+            this.btnDisconnect = new System.Windows.Forms.Button();
+            this.btnConnect = new System.Windows.Forms.Button();
             this.lstSprServer = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.btnConnect = new System.Windows.Forms.Button();
-            this.btnDisconnect = new System.Windows.Forms.Button();
             this.tabDownloads.SuspendLayout();
             this.tabUser.SuspendLayout();
             this.tabDC.SuspendLayout();
@@ -198,6 +198,24 @@
             this.tabServer.Text = "Home";
             this.tabServer.UseVisualStyleBackColor = true;
             // 
+            // btnDisconnect
+            // 
+            this.btnDisconnect.Location = new System.Drawing.Point(484, 430);
+            this.btnDisconnect.Name = "btnDisconnect";
+            this.btnDisconnect.Size = new System.Drawing.Size(476, 23);
+            this.btnDisconnect.TabIndex = 4;
+            this.btnDisconnect.Text = "Disconnect";
+            this.btnDisconnect.UseVisualStyleBackColor = true;
+            // 
+            // btnConnect
+            // 
+            this.btnConnect.Location = new System.Drawing.Point(30, 430);
+            this.btnConnect.Name = "btnConnect";
+            this.btnConnect.Size = new System.Drawing.Size(447, 23);
+            this.btnConnect.TabIndex = 3;
+            this.btnConnect.Text = "Connect";
+            this.btnConnect.UseVisualStyleBackColor = true;
+            // 
             // lstSprServer
             // 
             this.lstSprServer.FormattingEnabled = true;
@@ -215,24 +233,6 @@
             this.label1.Size = new System.Drawing.Size(106, 20);
             this.label1.TabIndex = 1;
             this.label1.Text = "Super Server:";
-            // 
-            // btnConnect
-            // 
-            this.btnConnect.Location = new System.Drawing.Point(30, 430);
-            this.btnConnect.Name = "btnConnect";
-            this.btnConnect.Size = new System.Drawing.Size(447, 23);
-            this.btnConnect.TabIndex = 3;
-            this.btnConnect.Text = "Connect";
-            this.btnConnect.UseVisualStyleBackColor = true;
-            // 
-            // btnDisconnect
-            // 
-            this.btnDisconnect.Location = new System.Drawing.Point(484, 430);
-            this.btnDisconnect.Name = "btnDisconnect";
-            this.btnDisconnect.Size = new System.Drawing.Size(476, 23);
-            this.btnDisconnect.TabIndex = 4;
-            this.btnDisconnect.Text = "Disconnect";
-            this.btnDisconnect.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
