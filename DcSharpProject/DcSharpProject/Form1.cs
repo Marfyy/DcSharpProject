@@ -15,13 +15,13 @@ namespace DcSharpProject
 {
     public partial class Form1 : Form
     {
-        ServerAuthentication serverAuth;
+        ServerConnector serverAuth;
         TcpListener tcpListener = new TcpListener(IPAddress.Any, 9999);
         bool listen = true;
         public Form1()
         {
             InitializeComponent();
-            serverAuth = new ServerAuthentication();
+            serverAuth = new ServerConnector();
             Thread getmessages = new Thread(new ThreadStart(ListenForClients)); //Starts the thread get messages as handleservercomm.
             getmessages.IsBackground = true; //Makes it a background process for correct shutdown of program.
             getmessages.Start(); //Starts the getmessages.
@@ -51,11 +51,8 @@ namespace DcSharpProject
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            WebClient client = new WebClient();
-            byte[] data = client.DownloadData(@"http://ipinfo.io/ip");
-            string IP = ASCIIEncoding.ASCII.GetString(data); //Gets the external IP for the network, with a \n at the end
-            IP = IP.Remove((IP.Length - 1)); //Removes the \n
-            serverAuth.logonToServer("213.100.234.13", 9999, "asdf", "asdf");
+            Server server = new Server("asdf", "213.100.234.13", 9999, "asdf", "asdf");
+            serverAuth.loginToServer("213.100.234.13", 9999, "asdf", "asdf");
         }
     }
 }
