@@ -16,6 +16,7 @@ namespace DcSharpProject
         public int Port { get; private set; }
         public string UserName { get; private set; }
         public string Password { get; private set; }
+        private List<User> users;
 
         public Server(string name, string IP, int port, string username, string password)
         {
@@ -24,6 +25,25 @@ namespace DcSharpProject
             this.Port = port;
             this.UserName = username;
             this.Password = password;
+            users = new List<User>();
+        }
+        public Server(string name, string IP, int port, string username, string password, List<User> users)
+        {
+            this.Name = name;
+            this.IP = IP;
+            this.Port = port;
+            this.UserName = username;
+            this.Password = password;
+            this.users = users;
+        }
+        public string[] getUserNames()
+        {
+            string[] output = new string[users.Count];
+            for(int i = 0; i < output.Length; i++)
+            {
+                output[i] = users[i].Name;
+            }
+            return output;
         }
   
     }
