@@ -14,13 +14,13 @@ namespace DcSharpProject
     /// </summary>
     class ServerAuthentication
     {
-
-        public bool logonToServer(string serverIP, int serverPort, string userIP, int userPort, string userName, string userPassword)
+        TcpListener listener;
+        public bool logonToServer(string serverIP, int serverPort, string userName, string userPassword)
         {
             ASCIIEncoding encoder = new ASCIIEncoding();
             byte[] IP = encoder.GetBytes(serverIP);
-            TcpListener listener = new TcpListener(new IPAddress(IP), serverPort);
-            string message = "$ " + userName + " " + userPassword + " " + userIP + " " + userPort;
+            listener = new TcpListener(IPAddress.Parse(serverIP), serverPort);
+            string message = "$ " + userName + " " + userPassword;
             try
             {
                 //SEND LOGIN MESSAGE TO SERVER
@@ -34,7 +34,10 @@ namespace DcSharpProject
                 listener.Server.ReceiveTimeout = 1000;
                 listener.Server.SendTimeout = 1000;
                 listener.Start();
+                Thread timeoutThread = new Thread(new ThreadStart(AuthenticationTimeout)); //Makes the client wait 10 seconds for the server to respond to the login, else abort
+                timeoutThread.Start();
                 server = listener.AcceptTcpClient();
+                timeoutThread.Abort();
                 stream = server.GetStream();
                 stream.ReadTimeout = 1000;
                 int bytesRead;
@@ -58,7 +61,11 @@ namespace DcSharpProject
             {
                 return false;
             }
-            return false;
+        }
+        private void AuthenticationTimeout()
+        {
+            Thread.Sleep(10000);
+            listener.Server.Close();
         }
         public bool logoutFromServer(ConnectedServer server)
         {
