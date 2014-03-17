@@ -34,6 +34,8 @@
             this.portbox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.lst_serverlist = new System.Windows.Forms.ListBox();
             this.SuspendLayout();
             // 
             // textBox1
@@ -41,7 +43,7 @@
             this.textBox1.Location = new System.Drawing.Point(15, 68);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(279, 290);
+            this.textBox1.Size = new System.Drawing.Size(213, 290);
             this.textBox1.TabIndex = 0;
             // 
             // button1
@@ -89,11 +91,30 @@
             this.label2.TabIndex = 5;
             this.label2.Text = "Connected Clients";
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(262, 52);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(50, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Serverlist";
+            // 
+            // lst_serverlist
+            // 
+            this.lst_serverlist.FormattingEnabled = true;
+            this.lst_serverlist.Location = new System.Drawing.Point(247, 69);
+            this.lst_serverlist.Name = "lst_serverlist";
+            this.lst_serverlist.Size = new System.Drawing.Size(216, 290);
+            this.lst_serverlist.TabIndex = 8;
+            // 
             // ServerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(357, 405);
+            this.ClientSize = new System.Drawing.Size(501, 405);
+            this.Controls.Add(this.lst_serverlist);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.portbox);
@@ -116,6 +137,8 @@
         private System.Windows.Forms.TextBox portbox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ListBox lst_serverlist;
     }
 }
 

@@ -21,6 +21,8 @@ namespace klient
         protected TcpClient client;// = new TcpClient(); //New instance of a tcpclient (client)
         protected IPEndPoint serverEndPoint;// = new IPEndPoint(IPAddress.Parse(ip), port); //Defining the ip and port to server for later use.
         private Thread getmessages; //A thread that will be used to continiously read from the server.
+        bool connected;
+        int prevport = 9999;
         public ClientForm()
         {
             InitializeComponent();
@@ -107,11 +109,27 @@ namespace klient
 
         private void connectbtn_Click(object sender, EventArgs e)
         {
-            ip = txt_ip.Text;
-            port = int.Parse(txt_port.Text);
+            //ip = txt_ip.Text;
+            //port = int.Parse(txt_port.Text);
+
+            ip = "192.168.0.118";
+            port = 9999;
         client = new TcpClient(); //New instance of a tcpclient (client)
-        serverEndPoint = new IPEndPoint(IPAddress.Parse(ip), port); //Defining the ip and port to server for later use.
-        client.Connect(serverEndPoint); //Connect to the pre-defined ip and port, which is the server.
+            while (!connected)
+            {
+                try
+                {
+                    serverEndPoint = new IPEndPoint(IPAddress.Parse(ip), port); //Defining the ip and port to server for later use.
+                    client.Connect(serverEndPoint); //Connect to the pre-defined ip and port, which is the server.
+                    connected = true;
+                }
+                catch (Exception ex)
+                {
+                    port = port - 1;
+                }
+            }
+             
+
         this.getmessages = new Thread(new ThreadStart(handleservercomm)); //Starts the thread get messages as handleservercomm.
         this.getmessages.IsBackground = true; //Makes it a background process for correct shutdown of program.
         this.getmessages.Start(); //Starts the getmessages.

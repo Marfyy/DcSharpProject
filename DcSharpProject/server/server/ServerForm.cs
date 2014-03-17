@@ -13,25 +13,28 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace server
 {
     public partial class ServerForm : Form
     {
         bool listen = true;
-            Dictionary<string, string> users = new Dictionary<string, string>();
-            Dictionary<string, object> klienter = new Dictionary<string, object>();
-            private TcpListener tcpListener; //A tcplistener.
-            private Thread listenThread; //A listenthread
-            string username;
-            string test;
-            int port;
-            
+        Dictionary<string, string> users = new Dictionary<string, string>();
+        Dictionary<string, object> klienter = new Dictionary<string, object>();
+        private TcpListener tcpListener; //A tcplistener.
+        private Thread listenThread; //A listenthread
+        string username;
+        string test;
+        int port;
+
         public ServerForm()
         {
             InitializeComponent();
             users.Add("markus", "hejsan123");
             users.Add("martin", "hejsan321");
+            getservers();
         }
 
         public void ListenForClients() //A method that loops aslong as listen is true.
@@ -48,7 +51,7 @@ namespace server
                 clientThread.Start(client);
             }
         }
-                public void HandleClientComm(object client) //This method handels the incoming messages.
+        public void HandleClientComm(object client) //This method handels the incoming messages.
         {
             TcpClient tcpClient = (TcpClient)client; //New tcp client
             NetworkStream clientStream = tcpClient.GetStream(); //new networkstream
@@ -94,11 +97,11 @@ namespace server
                         clientStream.Flush(); //Flushes the stream
                     }
                 }
-                if(tmp[0] == "#")
+                if (tmp[0] == "#")
                 {
                     users.Add(tmp[1], tmp[2]);
                 }
-            
+
                 clientStream.Flush();
             }
             tcpClient.Close();
@@ -113,9 +116,6 @@ namespace server
         {
             var lines = klienter.Select(kv => kv.Key + ": " + kv.Value.ToString());
             textBox1.Text = string.Join(Environment.NewLine, lines);
-
-            //var blines = users.Select(kv => kv.Key + ": " + kv.Value.ToString());
-            //textBox1.Text = string.Join(Environment.NewLine, blines);
         }
 
         private void portbtn_Click(object sender, EventArgs e)
@@ -127,6 +127,15 @@ namespace server
             this.listenThread.Start(); //Starts the listenerthread.
             portbox.Enabled = false;
             portbtn.Enabled = false;
+        }
+        private void getservers()
+        {
+            XDocument xmldoc = XDocument.Load("XMLFile1.xml");
+            var items = (from i in xmldoc.Descendants("interface")
+                         select new { IpAdress = i.Element("IpAdress").Value, Port = i.Element("port").Value }).ToList();
+
+            lst_serverlist.DataSource = items;
+            lst_serverlist.DisplayMember = "IpAdress" + "port";
         }
 
     }
