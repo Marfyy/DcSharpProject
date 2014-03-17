@@ -16,7 +16,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace server
 {
-    public partial class Form1 : Form
+    public partial class ServerForm : Form
     {
         bool listen = true;
             Dictionary<string, string> users = new Dictionary<string, string>();
@@ -25,14 +25,11 @@ namespace server
             private Thread listenThread; //A listenthread
             string username;
             string test;
+            int port;
             
-        public Form1()
+        public ServerForm()
         {
             InitializeComponent();
-            this.tcpListener = new TcpListener(IPAddress.Any, 9999); //Creates a TCPlistener that listens for any Ipadress but port 9998.
-            this.listenThread = new Thread(new ThreadStart(ListenForClients)); //New thread that will listen for clients.
-            this.listenThread.IsBackground = true; //Sets the thread to a background process.
-            this.listenThread.Start(); //Starts the listenerthread.
             users.Add("markus", "hejsan123");
             users.Add("martin", "hejsan321");
         }
@@ -64,7 +61,7 @@ namespace server
                 Thread.Sleep(10);
                 try
                 {
-                    //blocks until a client sends a message
+                    //blocks until a client sends a messages
                     bytesRead = clientStream.Read(message, 0, 4096);
                 }
                 catch
@@ -84,7 +81,7 @@ namespace server
                 //message has successfully been received
                 ASCIIEncoding encoder = new ASCIIEncoding();
                 username = (encoder.GetString(message, 0, bytesRead));
-                string[] tmp = username.Split(' ');
+                string[] tmp = username.Split('|');
                 if (tmp[0] == "$")
                 {
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
@@ -119,6 +116,17 @@ namespace server
 
             //var blines = users.Select(kv => kv.Key + ": " + kv.Value.ToString());
             //textBox1.Text = string.Join(Environment.NewLine, blines);
+        }
+
+        private void portbtn_Click(object sender, EventArgs e)
+        {
+            port = int.Parse(portbox.Text);
+            this.tcpListener = new TcpListener(IPAddress.Any, port); //Creates a TCPlistener that listens for any Ipadress but port 9999.
+            this.listenThread = new Thread(new ThreadStart(ListenForClients)); //New thread that will listen for clients.
+            this.listenThread.IsBackground = true; //Sets the thread to a background process.
+            this.listenThread.Start(); //Starts the listenerthread.
+            portbox.Enabled = false;
+            portbtn.Enabled = false;
         }
 
     }
