@@ -22,7 +22,7 @@ namespace klient
         protected IPEndPoint serverEndPoint;// = new IPEndPoint(IPAddress.Parse(ip), port); //Defining the ip and port to server for later use.
         private Thread getmessages; //A thread that will be used to continiously read from the server.
         bool connected;
-        int prevport = 9999;
+        //int prevport = 9999;
         public ClientForm()
         {
             InitializeComponent();
@@ -129,10 +129,14 @@ namespace klient
                 }
             }
              
-
         this.getmessages = new Thread(new ThreadStart(handleservercomm)); //Starts the thread get messages as handleservercomm.
         this.getmessages.IsBackground = true; //Makes it a background process for correct shutdown of program.
         this.getmessages.Start(); //Starts the getmessages.
         }
+
+      //  private void timer1_Tick(object sender, EventArgs e)
+        //{
+         //   timer1.Interval = 1000000;
+        //}
     }
 }
