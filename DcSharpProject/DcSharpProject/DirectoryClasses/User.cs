@@ -20,5 +20,12 @@ namespace DcSharpProject
             this.Name = name;
             this.SharedFiles = sharedFiles;
         }
+        public void updateDirectoryData(string rawDirData)
+        {
+            SharedFiles.folders.Add(new Folder("bajs"));
+            SharedFiles.folders[0].files.Add("bajs1.jpg");
+            SharedFiles.folders[0].files.Add("bajs2.avi");
+            SharedFiles.folders[0].files.Add("bajs3.exe");
+        }
     }
 }

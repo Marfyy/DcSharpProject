@@ -30,7 +30,31 @@ namespace DcSharpProject
             this.listenThread = new Thread(new ThreadStart(ListenForClients)); //New thread that will listen for clients.
             this.listenThread.IsBackground = true; //Sets the thread to a background process.
             this.listenThread.Start(); //Starts the listenerthread.
-            clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
+            //clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
+
+            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\usericon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\foldericon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\pictureicon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\movieicon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\miscicon.png"));
+            User testUser = new User("Rickard");
+            testUser.updateDirectoryData("asd");
+            int nrOfFolders = testUser.SharedFiles.folders.Count;
+            TreeNode[] nodes = new TreeNode[nrOfFolders];
+            for(int i = 0; i < nrOfFolders; i++)
+            {
+                
+                int nrOfFiles = testUser.SharedFiles.folders[i].files.Count;
+                TreeNode[] tempFolder = new TreeNode[nrOfFiles];
+                for(int j = 0; j < nrOfFiles; j++)
+                {
+                    tempFolder[j] = new TreeNode();
+                    tempFolder[j].Nodes.Add(new TreeNode(testUser.SharedFiles.folders[i].files[j], 1, 1));
+                }
+                nodes[i] = new TreeNode();
+                nodes[i].Nodes.AddRange(tempFolder);
+            }
+            userDirTreeView.Nodes.AddRange(nodes);
         }
 
         public void ListenForClients() //A method that loops aslong as listen is true.

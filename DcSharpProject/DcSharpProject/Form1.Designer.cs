@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.tabDownloads = new System.Windows.Forms.TabPage();
             this.lstUploads = new System.Windows.Forms.ListBox();
             this.label6 = new System.Windows.Forms.Label();
@@ -36,7 +37,6 @@
             this.tabUser = new System.Windows.Forms.TabPage();
             this.cmbServer = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.lstFiles = new System.Windows.Forms.ListBox();
             this.label4 = new System.Windows.Forms.Label();
             this.lstUser = new System.Windows.Forms.ListBox();
             this.label3 = new System.Windows.Forms.Label();
@@ -46,6 +46,8 @@
             this.btnConnect = new System.Windows.Forms.Button();
             this.lstSprServer = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.userDirTreeView = new System.Windows.Forms.TreeView();
+            this.dirIconList = new System.Windows.Forms.ImageList(this.components);
             this.tabDownloads.SuspendLayout();
             this.tabUser.SuspendLayout();
             this.tabDC.SuspendLayout();
@@ -104,9 +106,9 @@
             // 
             // tabUser
             // 
+            this.tabUser.Controls.Add(this.userDirTreeView);
             this.tabUser.Controls.Add(this.cmbServer);
             this.tabUser.Controls.Add(this.label2);
-            this.tabUser.Controls.Add(this.lstFiles);
             this.tabUser.Controls.Add(this.label4);
             this.tabUser.Controls.Add(this.lstUser);
             this.tabUser.Controls.Add(this.label3);
@@ -135,14 +137,6 @@
             this.label2.Size = new System.Drawing.Size(59, 20);
             this.label2.TabIndex = 6;
             this.label2.Text = "Server:";
-            // 
-            // lstFiles
-            // 
-            this.lstFiles.FormattingEnabled = true;
-            this.lstFiles.Location = new System.Drawing.Point(231, 83);
-            this.lstFiles.Name = "lstFiles";
-            this.lstFiles.Size = new System.Drawing.Size(740, 368);
-            this.lstFiles.TabIndex = 5;
             // 
             // label4
             // 
@@ -235,6 +229,22 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Super Server:";
             // 
+            // userDirTreeView
+            // 
+            this.userDirTreeView.ImageIndex = 0;
+            this.userDirTreeView.ImageList = this.dirIconList;
+            this.userDirTreeView.Location = new System.Drawing.Point(231, 84);
+            this.userDirTreeView.Name = "userDirTreeView";
+            this.userDirTreeView.SelectedImageIndex = 0;
+            this.userDirTreeView.Size = new System.Drawing.Size(740, 367);
+            this.userDirTreeView.TabIndex = 8;
+            // 
+            // dirIconList
+            // 
+            this.dirIconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.dirIconList.ImageSize = new System.Drawing.Size(16, 16);
+            this.dirIconList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -267,13 +277,14 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox cmbServer;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ListBox lstFiles;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ListBox lstUser;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox lstSprServer;
         private System.Windows.Forms.Button btnConnect;
         private System.Windows.Forms.Button btnDisconnect;
+        private System.Windows.Forms.TreeView userDirTreeView;
+        private System.Windows.Forms.ImageList dirIconList;
     }
 }
 

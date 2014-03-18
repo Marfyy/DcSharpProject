@@ -8,7 +8,7 @@ namespace DcSharpProject
 {
     class Directory
     {
-        private List<Folder> folders;
+        public List<Folder> folders;
         public Directory()
         {
             folders = new List<Folder>();

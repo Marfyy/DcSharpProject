@@ -9,7 +9,7 @@ namespace DcSharpProject
     class Folder
     {
         public string Name { get; private set; }
-        private List<string> files;
+        public List<string> files;
         public Folder(string name)
         {
             this.Name = name;
