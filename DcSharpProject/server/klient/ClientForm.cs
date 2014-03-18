@@ -123,7 +123,7 @@ namespace klient
                     client.Connect(serverEndPoint); //Connect to the pre-defined ip and port, which is the server.
                     connected = true;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     port = port - 1;
                 }
@@ -133,10 +133,5 @@ namespace klient
         this.getmessages.IsBackground = true; //Makes it a background process for correct shutdown of program.
         this.getmessages.Start(); //Starts the getmessages.
         }
-
-      //  private void timer1_Tick(object sender, EventArgs e)
-        //{
-         //   timer1.Interval = 1000000;
-        //}
     }
 }

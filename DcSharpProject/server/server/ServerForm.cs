@@ -25,6 +25,7 @@ namespace server
         Dictionary<string, object> klienter = new Dictionary<string, object>();
         private TcpListener tcpListener; //A tcplistener.
         private Thread listenThread; //A listenthread
+        private Thread heartbeatThread;
         string username;
         string test;
         int port;
@@ -35,6 +36,8 @@ namespace server
             users.Add("markus", "hejsan123");
             users.Add("martin", "hejsan321");
             getservers();
+            timer1.Interval = 10000;
+            timer1.Start();
         }
 
         public void ListenForClients() //A method that loops aslong as listen is true.
@@ -87,26 +90,70 @@ namespace server
                 string[] tmp = username.Split('|');
                 if (tmp[0] == "$")
                 {
+
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
                     {
-
-                        klienter.Add(tmp[1], test);
-                        string result = string.Join(", ", klienter.Select(x => string.Format("{0} : {1}", x.Key, x.Value)).ToArray());
-                        byte[] buffer = encoder.GetBytes(result); //a byte array to store the message in after it has been encoded.
-                        clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
-                        clientStream.Flush(); //Flushes the stream
+                        if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(test))
+                        {
+                            klienter.Add(tmp[1], test);
+                            string result = string.Join(", ", klienter.Select(x => string.Format("{0} : {1}", x.Key, x.Value)).ToArray());
+                            byte[] buffer = encoder.GetBytes(result); //a byte array to store the message in after it has been encoded.
+                            clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
+                            clientStream.Flush(); //Flushes the stream
+                        }
                     }
                 }
                 if (tmp[0] == "#")
                 {
                     users.Add(tmp[1], tmp[2]);
                 }
+                if (tmp[0] == "'")
+                {
+                    string svar = "jag lever";
+                    byte[] answer = encoder.GetBytes(svar);
+                    clientStream.Write(answer, 0, answer.Length);
+                    clientStream.Flush();
+                }
 
                 clientStream.Flush();
             }
             tcpClient.Close();
         }
+        public static bool PingHost(string _HostURI, int _PortNumber)
+        {
+            try
+            {
+                TcpClient client = new TcpClient(_HostURI, _PortNumber);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error pinging host:'" + _HostURI + ":" + _PortNumber.ToString() + "'");
+                return false;
+            }
+        }
+        public void heartbeat()
+        {
+            string ip = "192.168.0.118";
+            XDocument xmldoc = XDocument.Load("XMLFile1.xml");
 
+            var test = (from p in xmldoc.Descendants("interface")
+                        select int.Parse(p.Element("port").Value)).ToList();
+
+            foreach (var item in test)
+            {
+                if (item > port)
+                {
+                    if (!PingHost(ip, item))
+                    {
+                        port = item;
+                        listenThread.Abort();
+                        connect(port);
+                    }
+                }
+            }
+            heartbeatThread.Abort();
+        }
 
         public void Form1_Load(object sender, EventArgs e)
         {
@@ -121,12 +168,16 @@ namespace server
         private void portbtn_Click(object sender, EventArgs e)
         {
             port = int.Parse(portbox.Text);
+            connect(port);
+            portbox.Enabled = false;
+            portbtn.Enabled = false;
+        }
+        private void connect(int port)
+        {
             this.tcpListener = new TcpListener(IPAddress.Any, port); //Creates a TCPlistener that listens for any Ipadress but port 9999.
             this.listenThread = new Thread(new ThreadStart(ListenForClients)); //New thread that will listen for clients.
             this.listenThread.IsBackground = true; //Sets the thread to a background process.
             this.listenThread.Start(); //Starts the listenerthread.
-            portbox.Enabled = false;
-            portbtn.Enabled = false;
         }
         private void getservers()
         {
@@ -136,6 +187,13 @@ namespace server
 
             lst_serverlist.DataSource = items;
             lst_serverlist.DisplayMember = "IpAdress" + "port";
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            this.heartbeatThread = new Thread(new ThreadStart(heartbeat)); //New thread that will listen for clients.
+            this.heartbeatThread.IsBackground = true; //Sets the thread to a background process.
+            this.heartbeatThread.Start(); //Starts the listenerthread.
         }
 
     }
