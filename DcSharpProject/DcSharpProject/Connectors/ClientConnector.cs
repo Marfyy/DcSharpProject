@@ -12,35 +12,47 @@ namespace DcSharpProject
 {
     class ClientConnector
     {
-        public void sendCompleteFile(string URI, Client client)
+        public void sendFile(string URI, int offset, Client client)
         {
             try
             {
                 TcpClient receiverClient = new TcpClient(client.IP, client.Port);
                 NetworkStream receiverStream = receiverClient.GetStream();
                 byte[] data = File.ReadAllBytes(URI);
-                int nrOfSubParts = (data.Length/ receiverClient.ReceiveBufferSize) + 1;
-                int lastPackageSize = data.Length - ((nrOfSubParts - 1) * receiverClient.ReceiveBufferSize);
-                for (int i = 0; i < nrOfSubParts; i++)
-                {
-                    if (i < nrOfSubParts - 1)
-                    {
-                        while (!receiverStream.CanRead) { }
-                        receiverStream.Write(data, i * receiverClient.ReceiveBufferSize, receiverClient.ReceiveBufferSize);
-                        receiverStream.Flush();
-                    }
-                    else
-                    {
-                        while (!receiverStream.CanRead) { }
-                        receiverStream.Write(data, i * receiverClient.ReceiveBufferSize, lastPackageSize);
-                        receiverStream.Flush();
-                    }
-                }               
+                FileStream file = new FileStream(URI, FileMode.Open);
+                file.Seek((long)offset, SeekOrigin.Begin);
+                file.CopyTo(receiverStream, receiverClient.ReceiveBufferSize);
+                //int nrOfSubParts = (data.Length/ receiverClient.ReceiveBufferSize) + 1;
+                //int lastPackageSize = data.Length - ((nrOfSubParts - 1) * receiverClient.ReceiveBufferSize);
+                //for (int i = 0; i < nrOfSubParts; i++)
+                //{
+                //    if (i < nrOfSubParts - 1)
+                //    {
+                //        while (!receiverStream.CanRead) { }
+                //        receiverStream.Write(data, i * receiverClient.ReceiveBufferSize, receiverClient.ReceiveBufferSize);
+                //        receiverStream.Flush();
+                //    }
+                //    else
+                //    {
+                //        while (!receiverStream.CanRead) { }
+                //        receiverStream.Write(data, i * receiverClient.ReceiveBufferSize, lastPackageSize);
+                //        receiverStream.Flush();
+                //    }
+                //}               
             }
             catch(SocketException)
             {
                 //Lost connection
             }
+        }
+        //För att kontrollera redan nerladdad data, hasha alla färdiga paket, skicka nycklarna och paketnr till klient. klient svarar med vilka paket som den vill ha
+        public void sendPartialFile(string URI, int offset, Client client)
+        {
+            TcpClient receiverClient = new TcpClient(client.IP, client.Port);
+            NetworkStream receiverStream = receiverClient.GetStream();
+            byte[] data = File.ReadAllBytes(URI);
+            FileStream file = new FileStream(URI, FileMode.Open);
+            file.CopyTo(receiverStream);
         }
     }
 }
