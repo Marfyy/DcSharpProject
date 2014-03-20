@@ -31,34 +31,42 @@ namespace klient
 
         private void handleservercomm() //This method is used to read incoming messages from the server
         {
-            NetworkStream clientStream = client.GetStream(); // creates a networkstream from the client.
-            ASCIIEncoding encoder = new ASCIIEncoding(); //Creates a simple ASCII Encoder to "unpack" the incomming messages from bytes.
-            clientStream.ReadTimeout = 100; // sets a timeout at 100 miliseconds.
-
-            byte[] response = new byte[4096]; //Creates a bytearray to store the incoming message in.
-            int bytesRead = 0; // an integer that will be used to check how much data that has been read.
-
-            while (clientStream.CanRead) //aslong as the clientstream can read from the server, this loop will be alive.
+            try
             {
-                bytesRead = 0; //sets the bytes read to zero from beginning.
-                Thread.Sleep(10); //suspends the thread for 10 milliseconds.
-                try
+                NetworkStream clientStream = client.GetStream(); // creates a networkstream from the client.
+
+
+                ASCIIEncoding encoder = new ASCIIEncoding(); //Creates a simple ASCII Encoder to "unpack" the incomming messages from bytes.
+                clientStream.ReadTimeout = 100; // sets a timeout at 100 miliseconds.
+
+                byte[] response = new byte[4096]; //Creates a bytearray to store the incoming message in.
+                int bytesRead = 0; // an integer that will be used to check how much data that has been read.
+
+                while (clientStream.CanRead) //aslong as the clientstream can read from the server, this loop will be alive.
                 {
-                    bytesRead = clientStream.Read(response, 0, 4096); //Tries to read from the stream.
+                    bytesRead = 0; //sets the bytes read to zero from beginning.
+                    Thread.Sleep(10); //suspends the thread for 10 milliseconds.
+                    try
+                    {
+                        bytesRead = clientStream.Read(response, 0, 4096); //Tries to read from the stream.
+                    }
+                    catch
+                    {
+                        break; //breaks if something goes wrong.
+                    }
+                    if (bytesRead == 0) //if no bytes are read, break.
+                    {
+                        break;
+                    }
+                    string msg = encoder.GetString(response, 0, bytesRead); //saves the incoming message into a string called msg. It uses the ASCII Encoder.
+                    SetText(msg); //Sends the message to an invoke class. This is because the value comes from a different place.
+                    clientStream.Flush(); //Flushes the clientstream.
                 }
-                catch
-                {
-                    break; //breaks if something goes wrong.
-                }
-                if (bytesRead == 0) //if no bytes are read, break.
-                {
-                    break;
-                }
-                string msg = encoder.GetString(response, 0, bytesRead); //saves the incoming message into a string called msg. It uses the ASCII Encoder.
-                SetText(msg); //Sends the message to an invoke class. This is because the value comes from a different place.
-                clientStream.Flush(); //Flushes the clientstream.
             }
-            handleservercomm();
+            catch
+            {
+                connect("10.1.1.114",9999);
+            }
         }
 
         delegate void SetTextCallback(string text);
@@ -109,12 +117,13 @@ namespace klient
 
         private void connectbtn_Click(object sender, EventArgs e)
         {
-            //ip = txt_ip.Text;
-            //port = int.Parse(txt_port.Text);
-
-            ip = "192.168.0.118";
+            ip = "10.1.1.114";
             port = 9999;
-        client = new TcpClient(); //New instance of a tcpclient (client)
+            connect(ip, port);
+        }
+        public void connect(string ip, int port)
+        {
+            client = new TcpClient(); //New instance of a tcpclient (client)
             while (!connected)
             {
                 try
@@ -123,15 +132,15 @@ namespace klient
                     client.Connect(serverEndPoint); //Connect to the pre-defined ip and port, which is the server.
                     connected = true;
                 }
-                catch (Exception)
+                catch (Exception es)
                 {
-                    port = port - 1;
+                    MessageBox.Show(es.Message);
                 }
             }
-             
-        this.getmessages = new Thread(new ThreadStart(handleservercomm)); //Starts the thread get messages as handleservercomm.
-        this.getmessages.IsBackground = true; //Makes it a background process for correct shutdown of program.
-        this.getmessages.Start(); //Starts the getmessages.
+
+            this.getmessages = new Thread(new ThreadStart(handleservercomm)); //Starts the thread get messages as handleservercomm.
+            this.getmessages.IsBackground = true; //Makes it a background process for correct shutdown of program.
+            this.getmessages.Start(); //Starts the getmessages.
         }
     }
 }

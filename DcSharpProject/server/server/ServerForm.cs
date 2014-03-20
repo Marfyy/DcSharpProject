@@ -15,6 +15,7 @@ using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml;
 using System.Xml.Linq;
+using System.Diagnostics;
 
 namespace server
 {
@@ -36,7 +37,7 @@ namespace server
             users.Add("markus", "hejsan123");
             users.Add("martin", "hejsan321");
             getservers();
-            timer1.Interval = 10000;
+            timer1.Interval = 19000;
             timer1.Start();
         }
 
@@ -51,6 +52,7 @@ namespace server
                 ////create a thread to handle communication 
                 //with connected client
                 Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
+                clientThread.IsBackground = true;
                 clientThread.Start(client);
             }
         }
@@ -123,18 +125,20 @@ namespace server
         {
             try
             {
-                TcpClient client = new TcpClient(_HostURI, _PortNumber);
+             TcpClient client = new TcpClient();
+                client.Connect(_HostURI,_PortNumber);
                 return true;
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error pinging host:'" + _HostURI + ":" + _PortNumber.ToString() + "'");
-                return false;
+                //MessageBox.Show("Error pinging host:'" + _HostURI + ":" + _PortNumber.ToString() + "'");
+                
             }
+            return false;
         }
         public void heartbeat()
         {
-            string ip = "192.168.0.118";
+            string ip = "10.1.1.114";
             XDocument xmldoc = XDocument.Load("XMLFile1.xml");
 
             var test = (from p in xmldoc.Descendants("interface")
@@ -142,13 +146,20 @@ namespace server
 
             foreach (var item in test)
             {
+
+                Debug.WriteLine("Compare my port " + port + " against item port " + item);
+
                 if (item > port)
                 {
-                    if (!PingHost(ip, item))
+                    bool resultPing = PingHost(ip, item);
+                    Debug.WriteLine("Ping result" + resultPing);
+                    if (!resultPing)
                     {
+                        Debug.WriteLine("My port is " + port + ", switching to " + item);
                         port = item;
-                        listenThread.Abort();
+                        //listenThread.Abort();
                         connect(port);
+                        
                     }
                 }
             }
@@ -194,6 +205,12 @@ namespace server
             this.heartbeatThread = new Thread(new ThreadStart(heartbeat)); //New thread that will listen for clients.
             this.heartbeatThread.IsBackground = true; //Sets the thread to a background process.
             this.heartbeatThread.Start(); //Starts the listenerthread.
+        }
+
+        private void btn_exitServer_Click(object sender, EventArgs e)
+        {
+           
+            Environment.Exit(0);
         }
 
     }

@@ -38,6 +38,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.lst_serverlist = new System.Windows.Forms.ListBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.btn_exitServer = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // textBox1
@@ -114,11 +115,22 @@
             // 
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
+            // btn_exitServer
+            // 
+            this.btn_exitServer.Location = new System.Drawing.Point(388, 370);
+            this.btn_exitServer.Name = "btn_exitServer";
+            this.btn_exitServer.Size = new System.Drawing.Size(75, 23);
+            this.btn_exitServer.TabIndex = 9;
+            this.btn_exitServer.Text = "Exit";
+            this.btn_exitServer.UseVisualStyleBackColor = true;
+            this.btn_exitServer.Click += new System.EventHandler(this.btn_exitServer_Click);
+            // 
             // ServerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(501, 405);
+            this.Controls.Add(this.btn_exitServer);
             this.Controls.Add(this.lst_serverlist);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
@@ -146,6 +158,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox lst_serverlist;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button btn_exitServer;
     }
 }
 
