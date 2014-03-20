@@ -48,6 +48,7 @@
     <Compile Include="Connectors\ClientConnector.cs" />
     <Compile Include="DirectoryClasses\Directory.cs" />
     <Compile Include="DirectoryClasses\Folder.cs" />
+    <Compile Include="FileCopyEx.cs" />
     <Compile Include="Server.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
