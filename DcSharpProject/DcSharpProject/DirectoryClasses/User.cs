@@ -12,7 +12,7 @@ namespace DcSharpProject
     class User
     {
         public string Name { get; private set; }
-        public Directory SharedFiles { get; private set; }
+        public Directory SharedFiles { get; set; }
         public User(string name)
         {
             this.Name = name;

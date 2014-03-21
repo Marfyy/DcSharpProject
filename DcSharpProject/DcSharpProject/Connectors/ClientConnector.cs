@@ -59,6 +59,7 @@ namespace DcSharpProject
         {
             TcpClient receiverClient = new TcpClient(client.IP, client.Port);
             NetworkStream receiverStream = receiverClient.GetStream();
+            stream.Seek(0, SeekOrigin.Begin);
             stream.CopyTo(receiverStream, receiverClient.ReceiveBufferSize);
         }
     }

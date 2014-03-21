@@ -56,7 +56,6 @@ namespace DcSharpProject
             NetworkStream clientStream = tcpClient.GetStream(); //new networkstream
             MemoryStream stream = new MemoryStream();
             
-
            
             //If we've been passed an unhelpful initial length, just
             //use 32K.
@@ -97,9 +96,8 @@ namespace DcSharpProject
                 //fileDir.Write(output, 0, output.Length);
                 //clientStream.CopyTo(fileDir);
                 
-                MessageBox.Show(Encoding.UTF8.GetString(output, 0, output.Length));
+                
                 MemoryStream stream1 = new MemoryStream(output);
-
 
                 User user = new User("Rickard");
                 user.updateDirectoryData(stream1);
@@ -107,8 +105,8 @@ namespace DcSharpProject
                 clientStream.Flush();
 
                 tcpClient.Close();
+                break;
             }
-            
         }
         public void clientSendFile(object client)
         {
@@ -143,7 +141,13 @@ namespace DcSharpProject
 
             Server server = new Server("asdf", "213.100.234.13", 9999, "asdf", "asdf");
             User user = new User("bajs");
-            
+            List<Folder> folders = new List<Folder>();
+            folders.Add(new Folder("asdf1"));
+            folders.Add(new Folder("asdf2"));
+            folders[0].addFile("fdsa1.jpg");
+            folders[0].addFile("fdsa2.avi");
+            folders[1].addFile("fdsa3.exe");
+            user.SharedFiles = new Directory(folders);
             if (true == false)
             {
                
@@ -189,8 +193,9 @@ namespace DcSharpProject
                         imageindex = 3;
                     }
                     else
+                        imageindex = 3;
 
-                        tempFolder[j] = new TreeNode(user.SharedFiles.folders[i].files[j], imageindex, imageindex);
+                    tempFolder[j] = new TreeNode(user.SharedFiles.folders[i].files[j], imageindex, imageindex);
                 }
                 folders[i] = new TreeNode(user.SharedFiles.folders[i].Name, 1, 1);
                 folders[i].Nodes.AddRange(tempFolder);
