@@ -60,6 +60,13 @@ namespace DcSharpProject
             string sendMessage = "% " + serverToReceive.UserName + " " + serverToReceive.Password;
             return sendMessageReturn(serverToReceive, sendMessage);
         }
+
+        /// <summary>
+        /// Gets user info
+        /// </summary>
+        /// <param name="serverToReceive"></param>
+        /// <param name="srcUsername"></param>
+        /// <returns></returns>
         public string getUserConnInfo(Server serverToReceive, string srcUsername)
         {
             string sendMessage = "@ " + serverToReceive.UserName + " " + serverToReceive.Password + " " + srcUsername;
@@ -125,5 +132,7 @@ namespace DcSharpProject
         /// </summary>
         /// <param name="serverToDisconnect"></param>
         /// <returns></returns>
+
+        
     }
 }

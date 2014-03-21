@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Net.Sockets;
-using System.Threading;
-using System.Net;
-using System.IO;
 namespace DcSharpProject
 {
     public partial class Form1 : Form
@@ -31,30 +31,9 @@ namespace DcSharpProject
             this.listenThread.IsBackground = true; //Sets the thread to a background process.
             this.listenThread.Start(); //Starts the listenerthread.
             //clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
+            GetUserData();
 
-            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\usericon.png"));
-            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\foldericon.png"));
-            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\pictureicon.png"));
-            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\movieicon.png"));
-            dirIconList.Images.Add(Image.FromFile(@"C:\DcSharpProject\DcSharpProject\DcSharpProject\miscicon.png"));
-            User testUser = new User("Rickard");
-            testUser.updateDirectoryData("asd");
-            int nrOfFolders = testUser.SharedFiles.folders.Count;
-            TreeNode[] nodes = new TreeNode[nrOfFolders];
-            for(int i = 0; i < nrOfFolders; i++)
-            {
-                
-                int nrOfFiles = testUser.SharedFiles.folders[i].files.Count;
-                TreeNode[] tempFolder = new TreeNode[nrOfFiles];
-                for(int j = 0; j < nrOfFiles; j++)
-                {
-                    tempFolder[j] = new TreeNode();
-                    tempFolder[j].Nodes.Add(new TreeNode(testUser.SharedFiles.folders[i].files[j], 1, 1));
-                }
-                nodes[i] = new TreeNode();
-                nodes[i].Nodes.AddRange(tempFolder);
-            }
-            userDirTreeView.Nodes.AddRange(nodes);
+            
         }
 
         public void ListenForClients() //A method that loops aslong as listen is true.
@@ -75,6 +54,10 @@ namespace DcSharpProject
         {
             TcpClient tcpClient = (TcpClient)client; //New tcp client
             NetworkStream clientStream = tcpClient.GetStream(); //new networkstream
+            MemoryStream stream = new MemoryStream();
+            
+
+           
             //If we've been passed an unhelpful initial length, just
             //use 32K.
             byte[] buffer = new byte[tcpClient.ReceiveBufferSize];
@@ -101,22 +84,31 @@ namespace DcSharpProject
 
                     // Nope. Resize the buffer, put in the byte we've just
                     // read, and continue
-                    byte[] newBuffer = new byte[buffer.Length*2];
+                    byte[] newBuffer = new byte[buffer.Length * 2];
                     Array.Copy(buffer, newBuffer, buffer.Length);
                     newBuffer[read] = (byte)nextByte;
                     buffer = newBuffer;
                     read++;
                 }
-                // Buffer is now too big. Shrink it.
+                //Buffer is now too big. Shrink it.
                 output = new byte[read];
                 Array.Copy(buffer, output, read);
-                FileStream fileDir = new FileStream(@"C:\asdf.mp4", FileMode.Append);
-                fileDir.Write(output, 0, output.Length);
+                //FileStream fileDir = new FileStream(@"C:\asdf.mp4", FileMode.Append);
+                //fileDir.Write(output, 0, output.Length);
                 //clientStream.CopyTo(fileDir);
+                
+                MessageBox.Show(Encoding.UTF8.GetString(output, 0, output.Length));
+                MemoryStream stream1 = new MemoryStream(output);
+
+
+                User user = new User("Rickard");
+                user.updateDirectoryData(stream1);
+                importUserDirtoTreeview(user);
                 clientStream.Flush();
 
                 tcpClient.Close();
             }
+            
         }
         public void clientSendFile(object client)
         {
@@ -139,6 +131,74 @@ namespace DcSharpProject
             Server server = new Server("asdf", "213.100.234.13", 9999, "asdf", "asdf");
             serverConn.loginToServer(server);
         }
+
+        private void GetUserData()
+        {
+
+            dirIconList.Images.Add(Image.FromFile(@"usericon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"foldericon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"pictureicon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"movieicon.png"));
+            dirIconList.Images.Add(Image.FromFile(@"miscicon.png"));
+
+            Server server = new Server("asdf", "213.100.234.13", 9999, "asdf", "asdf");
+            User user = new User("bajs");
+            
+            if (true == false)
+            {
+               
+            }
+            else 
+            {
+                MemoryStream stream;
+                stream = user.getDirectoryData();
+
+                Client client = new Client("127.0.0.1", 9999);
+                clientConn.sendUserDirectory(stream, client);
+
+
+                
+
+            }
+        }
+
+        private void importUserDirtoTreeview(User user)
+        {
+            int nrOfFolders = user.SharedFiles.folders.Count;
+
+            int imageindex;
+
+            TreeNode[] folders = new TreeNode[nrOfFolders];
+            for (int i = 0; i < nrOfFolders; i++)
+            {
+                int nrOfFiles = user.SharedFiles.folders[i].files.Count;
+                TreeNode[] tempFolder = new TreeNode[nrOfFiles];
+                for (int j = 0; j < nrOfFiles; j++)
+                {
+                    imageindex = -1;
+                    if (user.SharedFiles.folders[i].files[j].EndsWith(".jpg") == true || user.SharedFiles.folders[i].files[j].EndsWith(".jpeg") == true || user.SharedFiles.folders[i].files[j].EndsWith(".bmp") == true || user.SharedFiles.folders[i].files[j].EndsWith(".gif") == true || user.SharedFiles.folders[i].files[j].EndsWith(".png") == true)
+                    {
+                        imageindex = 2;
+                    }
+                    else if (user.SharedFiles.folders[i].files[j].EndsWith(".exe") == true)
+                    {
+                        imageindex = 4;
+                    }
+                    else if (user.SharedFiles.folders[i].files[j].EndsWith(".avi") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mov") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mp4") == true || user.SharedFiles.folders[i].files[j].EndsWith(".wmv") == true || user.SharedFiles.folders[i].files[j].EndsWith(".flv") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mpg") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mkv") == true)
+                    {
+                        imageindex = 3;
+                    }
+                    else
+
+                        tempFolder[j] = new TreeNode(user.SharedFiles.folders[i].files[j], imageindex, imageindex);
+                }
+                folders[i] = new TreeNode(user.SharedFiles.folders[i].Name, 1, 1);
+                folders[i].Nodes.AddRange(tempFolder);
+            }
+            TreeNode userNode = new TreeNode(user.Name, folders);
+            userDirTreeView.Nodes.Add(userNode);
+        }
+
     }
 }
 

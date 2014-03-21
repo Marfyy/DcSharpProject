@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DcSharpProject
 {
+    [Serializable]
     class Directory
     {
         public List<Folder> folders;
@@ -21,5 +22,6 @@ namespace DcSharpProject
         {
             return folders.ToArray();
         }
+
     }
 }
