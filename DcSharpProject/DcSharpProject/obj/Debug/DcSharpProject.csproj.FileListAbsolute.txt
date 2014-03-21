@@ -9,3 +9,11 @@ C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharp
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.exe
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.pdb
 C:\Users\Markus Olsson\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.exe.config
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.exe
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.pdb
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.exe
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.pdb
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.csprojResolveAssemblyReference.cache
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.Form1.resources
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.Properties.Resources.resources
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.csproj.GenerateResource.Cache

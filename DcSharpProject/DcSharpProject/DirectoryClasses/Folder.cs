@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace DcSharpProject
 {
+    [Serializable]
     class Folder
     {
         public string Name { get; private set; }

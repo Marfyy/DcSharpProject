@@ -54,5 +54,12 @@ namespace DcSharpProject
             FileStream file = new FileStream(URI, FileMode.Open);
             file.CopyTo(receiverStream);
         }
+
+        public void sendUserDirectory(MemoryStream stream, Client client)
+        {
+            TcpClient receiverClient = new TcpClient(client.IP, client.Port);
+            NetworkStream receiverStream = receiverClient.GetStream();
+            stream.CopyTo(receiverStream, receiverClient.ReceiveBufferSize);
+        }
     }
 }
