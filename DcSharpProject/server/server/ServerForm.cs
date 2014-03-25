@@ -91,7 +91,7 @@ namespace server
                 ASCIIEncoding encoder = new ASCIIEncoding();
                 username = (encoder.GetString(message, 0, bytesRead));
                 string[] tmp = username.Split('|');
-                if (tmp[0] == "$")
+                if (tmp[0] == "$") // Logga in
                 {
 
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
@@ -106,13 +106,16 @@ namespace server
                         }
                     }
                 }
-                if (tmp[0] == "#")
+                if (tmp[0] == "#") // Bli medlem
                 {
-                    users.Add(tmp[1], tmp[2]);
+                    if (!users.ContainsKey(tmp[1]) && !users.ContainsValue(tmp[2]))
+                    {
+                        users.Add(tmp[1], tmp[2]);
+                    }
                 }
-                if (tmp[0] == ",")
+                if (tmp[0] == ",") // Skicka klientlistan till servrarna
                 {
-                    if (klienter.ContainsKey(tmp[1]) && klienter.ContainsValue(tmp[2]))
+                    if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(tmp[2]))
                     {
                         klienter.Add(tmp[1], tmp[2]);
                     }
