@@ -97,14 +97,9 @@ namespace DcSharpProject
                 TcpClient server = new TcpClient(serverToConnect.IP, serverToConnect.Port);
                 NetworkStream stream = server.GetStream();
                 byte[] bMessage = encoder.GetBytes(sendMessage);
-                IPEndPoint localendpoint = (IPEndPoint)server.Client.LocalEndPoint;
-                listener = new TcpListener(IPAddress.Parse(serverToConnect.IP), localendpoint.Port);
                 stream.Write(bMessage, 0, bMessage.Length);
                 stream.Flush();
                 //RECIEVE RESPONSE FROM SERVER
-                //Thread timeoutThread = new Thread(new ThreadStart(AuthenticationTimeout)); //Makes the client wait 10 seconds for the server to respond to the message, else abort
-                //timeoutThread.Start();
-                //server = listener.AcceptTcpClient();
                 //If we've been passed an unhelpful initial length, just
                 //use 32K.
                 byte[] buffer = new byte[server.ReceiveBufferSize];
@@ -126,7 +121,6 @@ namespace DcSharpProject
                         {
                             done = true;
                             output = buffer;
-                            break;
                         }
 
                         // Nope. Resize the buffer, put in the byte we've just
@@ -141,9 +135,12 @@ namespace DcSharpProject
                     output = new byte[read];
                     Array.Copy(buffer, output, read);
                     message = Encoding.ASCII.GetString(output);
-
-                    server.Close();
-                    break;
+                    if(!(message.CompareTo(sendMessage.Substring(0, 1) + "OK") == 0) || done)
+                    {
+                        server.Close();
+                        break;
+                    }
+                    
                 }
             }
             catch (Exception)

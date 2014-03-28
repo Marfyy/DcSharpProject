@@ -38,7 +38,7 @@ namespace DcSharpProject
             this.clientListenThread.Start(); //Starts the listenerthread.
             //clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
             Server server = new Server("bajs", "10.1.1.114", 9999, "markus", "hejsan123");
-            serverConn.loginToServer(server);
+            serverConn.getCompleteUserListFromServer(server);
         }
         public void initGUI()
         {

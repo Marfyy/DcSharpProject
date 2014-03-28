@@ -36,7 +36,6 @@ namespace DcSharpProject
         {
             BinaryFormatter formatter = new BinaryFormatter();
             MemoryStream stream = new MemoryStream();
-
             formatter.Serialize(stream, SharedFiles);
 
             return stream;
