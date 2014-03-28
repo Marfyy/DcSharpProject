@@ -105,10 +105,10 @@ namespace server
                         if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(test))
                         {
                             klienter.Add(tmp[1], test);
-                            string result = string.Join(", ", klienter.Select(x => string.Format("{0} : {1}", x.Key, x.Value)).ToArray());
-                            byte[] buffer = encoder.GetBytes(result); //a byte array to store the message in after it has been encoded.
-                            clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
-                            clientStream.Flush(); //Flushes the stream
+                           // string result = string.Join(", ", klienter.Select(x => string.Format("{0} : {1}", x.Key, x.Value)).ToArray());
+                           // byte[] buffer = encoder.GetBytes(result); //a byte array to store the message in after it has been encoded.
+                           // clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
+                           //clientStream.Flush(); //Flushes the stream
                             okBuff = encoder.GetBytes(okMess);
                             clientStream.Write(okBuff, 0, okBuff.Length);
                             clientStream.Flush();

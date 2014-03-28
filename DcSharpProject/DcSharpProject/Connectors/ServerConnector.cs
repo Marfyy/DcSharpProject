@@ -97,26 +97,53 @@ namespace DcSharpProject
                 TcpClient server = new TcpClient(serverToConnect.IP, serverToConnect.Port);
                 NetworkStream stream = server.GetStream();
                 byte[] bMessage = encoder.GetBytes(sendMessage);
+                IPEndPoint localendpoint = (IPEndPoint)server.Client.LocalEndPoint;
+                listener = new TcpListener(IPAddress.Parse(serverToConnect.IP), localendpoint.Port);
                 stream.Write(bMessage, 0, bMessage.Length);
                 stream.Flush();
-
                 //RECIEVE RESPONSE FROM SERVER
-                listener.Start();
-                Thread timeoutThread = new Thread(new ThreadStart(AuthenticationTimeout)); //Makes the client wait 10 seconds for the server to respond to the message, else abort
-                timeoutThread.Start();
-                server = listener.AcceptTcpClient();
-                timeoutThread.Abort();
-                stream = server.GetStream();
-                int bytesRead;
-                while (stream.CanRead)
+                //Thread timeoutThread = new Thread(new ThreadStart(AuthenticationTimeout)); //Makes the client wait 10 seconds for the server to respond to the message, else abort
+                //timeoutThread.Start();
+                //server = listener.AcceptTcpClient();
+                //If we've been passed an unhelpful initial length, just
+                //use 32K.
+                byte[] buffer = new byte[server.ReceiveBufferSize];
+                int read = 0;
+                bool done = false;
+                int chunk;
+                byte[] output;
+                while ((chunk = stream.Read(buffer, read, buffer.Length - read)) > 0)
                 {
-                    bytesRead = stream.Read(bMessage, 0, bMessage.Length);
-                    if (bytesRead == 0)
-                        break;
-                    else
+                    read += chunk;
+                    // If we've reached the end of our buffer, check to see if there's
+                    // any more information
+                    if (read == buffer.Length)
                     {
-                        message += encoder.GetString(bMessage);
+                        int nextByte = stream.ReadByte();
+
+                        // End of stream? If so, we're done
+                        if (nextByte == -1)
+                        {
+                            done = true;
+                            output = buffer;
+                            break;
+                        }
+
+                        // Nope. Resize the buffer, put in the byte we've just
+                        // read, and continue
+                        byte[] newBuffer = new byte[buffer.Length * 2];
+                        Array.Copy(buffer, newBuffer, buffer.Length);
+                        newBuffer[read] = (byte)nextByte;
+                        buffer = newBuffer;
+                        read++;
                     }
+                    //Buffer is now too big. Shrink it.
+                    output = new byte[read];
+                    Array.Copy(buffer, output, read);
+                    message = Encoding.ASCII.GetString(output);
+
+                    server.Close();
+                    break;
                 }
             }
             catch (Exception)
