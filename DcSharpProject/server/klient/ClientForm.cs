@@ -31,8 +31,7 @@ namespace klient
 
         private void handleservercomm() //This method is used to read incoming messages from the server
         {
-            try
-            {
+           
                 NetworkStream clientStream = client.GetStream(); // creates a networkstream from the client.
 
 
@@ -61,12 +60,7 @@ namespace klient
                     string msg = encoder.GetString(response, 0, bytesRead); //saves the incoming message into a string called msg. It uses the ASCII Encoder.
                     SetText(msg); //Sends the message to an invoke class. This is because the value comes from a different place.
                     clientStream.Flush(); //Flushes the clientstream.
-                }
-            }
-            catch
-            {
-                connect("10.1.1.114",9999);
-            }
+                }    
         }
 
         delegate void SetTextCallback(string text);

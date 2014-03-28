@@ -34,6 +34,7 @@ namespace server
         public ServerForm()
         {
             InitializeComponent();
+            klienter.Add("Marreman", 1920301230);
             users.Add("markus", "hejsan123");
             users.Add("martin", "hejsan321");
             getservers();
@@ -90,7 +91,7 @@ namespace server
                 ASCIIEncoding encoder = new ASCIIEncoding();
                 username = (encoder.GetString(message, 0, bytesRead));
                 string[] tmp = username.Split('|');
-                if (tmp[0] == "$")
+                if (tmp[0] == "$") // Logga in
                 {
 
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
@@ -105,16 +106,19 @@ namespace server
                         }
                     }
                 }
-                if (tmp[0] == "#")
+                if (tmp[0] == "#") // Bli medlem
                 {
-                    users.Add(tmp[1], tmp[2]);
+                    if (!users.ContainsKey(tmp[1]) && !users.ContainsValue(tmp[2]))
+                    {
+                        users.Add(tmp[1], tmp[2]);
+                    }
                 }
-                if (tmp[0] == "'")
+                if (tmp[0] == ",") // Skicka klientlistan till servrarna
                 {
-                    string svar = "jag lever";
-                    byte[] answer = encoder.GetBytes(svar);
-                    clientStream.Write(answer, 0, answer.Length);
-                    clientStream.Flush();
+                    if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(tmp[2]))
+                    {
+                        klienter.Add(tmp[1], tmp[2]);
+                    }
                 }
 
                 clientStream.Flush();
@@ -161,6 +165,21 @@ namespace server
                         connect(port);
                         
                     }
+                }
+                if(item < port)
+                {
+                    bool resultPing = PingHost(ip, item);
+                    if(resultPing)
+                    {
+                        TcpClient client = new TcpClient(ip, item);
+                        NetworkStream clientStream = client.GetStream();
+                        ASCIIEncoding encoder = new ASCIIEncoding();
+                        string result = string.Join(",|", klienter.Select(x => string.Format("{0}|{1}|{2}", ",", x.Key, x.Value)).ToArray());
+                        byte[] buffer = encoder.GetBytes(result); //a byte array to store the message in after it has been encoded.
+                        clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
+                        clientStream.Flush();
+                    }
+
                 }
             }
             heartbeatThread.Abort();
