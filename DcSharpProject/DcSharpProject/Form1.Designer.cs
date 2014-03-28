@@ -35,6 +35,8 @@
             this.lstDownloads = new System.Windows.Forms.ListBox();
             this.label5 = new System.Windows.Forms.Label();
             this.tabUser = new System.Windows.Forms.TabPage();
+            this.userDirTreeView = new System.Windows.Forms.TreeView();
+            this.dirIconList = new System.Windows.Forms.ImageList(this.components);
             this.cmbServer = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
@@ -46,8 +48,6 @@
             this.btnConnect = new System.Windows.Forms.Button();
             this.lstSprServer = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.userDirTreeView = new System.Windows.Forms.TreeView();
-            this.dirIconList = new System.Windows.Forms.ImageList(this.components);
             this.tabDownloads.SuspendLayout();
             this.tabUser.SuspendLayout();
             this.tabDC.SuspendLayout();
@@ -120,6 +120,22 @@
             this.tabUser.Text = "Server";
             this.tabUser.UseVisualStyleBackColor = true;
             // 
+            // userDirTreeView
+            // 
+            this.userDirTreeView.ImageIndex = 0;
+            this.userDirTreeView.ImageList = this.dirIconList;
+            this.userDirTreeView.Location = new System.Drawing.Point(231, 84);
+            this.userDirTreeView.Name = "userDirTreeView";
+            this.userDirTreeView.SelectedImageIndex = 0;
+            this.userDirTreeView.Size = new System.Drawing.Size(740, 367);
+            this.userDirTreeView.TabIndex = 8;
+            // 
+            // dirIconList
+            // 
+            this.dirIconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.dirIconList.ImageSize = new System.Drawing.Size(16, 16);
+            this.dirIconList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
             // cmbServer
             // 
             this.cmbServer.FormattingEnabled = true;
@@ -155,6 +171,7 @@
             this.lstUser.Name = "lstUser";
             this.lstUser.Size = new System.Drawing.Size(201, 368);
             this.lstUser.TabIndex = 3;
+            this.lstUser.SelectedIndexChanged += new System.EventHandler(this.lstUser_SelectedIndexChanged);
             // 
             // label3
             // 
@@ -228,22 +245,6 @@
             this.label1.Size = new System.Drawing.Size(106, 20);
             this.label1.TabIndex = 1;
             this.label1.Text = "Super Server:";
-            // 
-            // userDirTreeView
-            // 
-            this.userDirTreeView.ImageIndex = 0;
-            this.userDirTreeView.ImageList = this.dirIconList;
-            this.userDirTreeView.Location = new System.Drawing.Point(231, 84);
-            this.userDirTreeView.Name = "userDirTreeView";
-            this.userDirTreeView.SelectedImageIndex = 0;
-            this.userDirTreeView.Size = new System.Drawing.Size(740, 367);
-            this.userDirTreeView.TabIndex = 8;
-            // 
-            // dirIconList
-            // 
-            this.dirIconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.dirIconList.ImageSize = new System.Drawing.Size(16, 16);
-            this.dirIconList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // Form1
             // 

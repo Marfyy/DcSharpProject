@@ -8,10 +8,24 @@ using System.Threading;
 using System.Net;
 using System.IO;
 
+//! = FileDownloadRequest
+//@ = SendDirectoryRequest
 namespace DcSharpProject
 {
     class ClientConnector
     {
+        TcpListener listener;
+
+        public string sendFileDownloadRequest(Client client, string fileRequested)
+        {
+            string sendMessage = "! " + fileRequested;
+            return sendMessageReturn(client, sendMessage);
+        }
+        public string sendDirectoryRequest(Client client)
+        {
+            string sendMessage = "@";
+            return sendMessageReturn(client, sendMessage);
+        }
         public void sendFile(string URI, int offset, Client client)
         {
             try
@@ -21,24 +35,7 @@ namespace DcSharpProject
                 byte[] data = File.ReadAllBytes(URI);
                 FileStream file = new FileStream(URI, FileMode.Open);
                 file.Seek((long)offset, SeekOrigin.Begin);
-                file.CopyTo(receiverStream, receiverClient.ReceiveBufferSize);
-                //int nrOfSubParts = (data.Length/ receiverClient.ReceiveBufferSize) + 1;
-                //int lastPackageSize = data.Length - ((nrOfSubParts - 1) * receiverClient.ReceiveBufferSize);
-                //for (int i = 0; i < nrOfSubParts; i++)
-                //{
-                //    if (i < nrOfSubParts - 1)
-                //    {
-                //        while (!receiverStream.CanRead) { }
-                //        receiverStream.Write(data, i * receiverClient.ReceiveBufferSize, receiverClient.ReceiveBufferSize);
-                //        receiverStream.Flush();
-                //    }
-                //    else
-                //    {
-                //        while (!receiverStream.CanRead) { }
-                //        receiverStream.Write(data, i * receiverClient.ReceiveBufferSize, lastPackageSize);
-                //        receiverStream.Flush();
-                //    }
-                //}               
+                file.CopyTo(receiverStream, receiverClient.ReceiveBufferSize);             
             }
             catch(SocketException)
             {
@@ -55,12 +52,61 @@ namespace DcSharpProject
             file.CopyTo(receiverStream);
         }
 
-        public void sendUserDirectory(MemoryStream stream, Client client)
+        public void sendUserDirectory(User user, Client client)
         {
+            MemoryStream stream = user.getDirectoryData();
             TcpClient receiverClient = new TcpClient(client.IP, client.Port);
             NetworkStream receiverStream = receiverClient.GetStream();
             stream.Seek(0, SeekOrigin.Begin);
             stream.CopyTo(receiverStream, receiverClient.ReceiveBufferSize);
+        }
+        private string sendMessageReturn(Client clientToConnect, string sendMessage)
+        {
+            ASCIIEncoding encoder = new ASCIIEncoding();
+            byte[] IP = encoder.GetBytes(clientToConnect.IP);
+            listener = new TcpListener(IPAddress.Parse(clientToConnect.IP), clientToConnect.Port);
+            string message = "";
+            try
+            {
+                //SEND MESSAGE TO SERVER
+                TcpClient server = new TcpClient(clientToConnect.IP, clientToConnect.Port);
+                NetworkStream stream = server.GetStream();
+                byte[] bMessage = encoder.GetBytes(sendMessage);
+                stream.Write(bMessage, 0, bMessage.Length);
+                stream.Flush();
+
+                //RECIEVE RESPONSE FROM SERVER
+                listener.Start();
+                Thread timeoutThread = new Thread(new ThreadStart(AuthenticationTimeout)); //Makes the client wait 10 seconds for the server to respond to the message, else abort
+                timeoutThread.Start();
+                server = listener.AcceptTcpClient();
+                timeoutThread.Abort();
+                stream = server.GetStream();
+                int bytesRead;
+                while (stream.CanRead)
+                {
+                    bytesRead = stream.Read(bMessage, 0, bMessage.Length);
+                    if (bytesRead == 0)
+                        break;
+                    else
+                    {
+                        message += encoder.GetString(bMessage);
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                return "Connection failure";
+            }
+            return message;
+        }
+        /// <summary>
+        /// Creates a 10 second delay, then terminates the listener. Used for ack packages from server
+        /// </summary>
+        private void AuthenticationTimeout()
+        {
+            Thread.Sleep(10000);
+            listener.Server.Close();
         }
     }
 }

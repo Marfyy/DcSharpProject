@@ -16,7 +16,7 @@ namespace DcSharpProject
         public int Port { get; private set; }
         public string UserName { get; private set; }
         public string Password { get; private set; }
-        private List<User> users;
+        public List<User> users;
 
         public Server(string name, string IP, int port, string username, string password)
         {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DcSharpProject
 {
-    class Client
+    public class Client
     {
         public string IP { get; set; }
         public int Port { get; set; }

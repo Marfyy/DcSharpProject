@@ -9,9 +9,10 @@ using System.Net;
 
 //$ = inlogg
 //# = registrering
-//¤ = utlogg
+//! = utlogg
 //% = hämta användarlista
 //@ = hämta en användares IP och port
+//~ = Användare heartbeat
 namespace DcSharpProject
 {
     /// <summary>
@@ -37,7 +38,7 @@ namespace DcSharpProject
         /// <returns>Server message</returns>
         public string logoutFromServer(Server serverToDisconnect)
         {
-            string sendMessage = "¤ " + serverToDisconnect.UserName + " " + serverToDisconnect.Password;
+            string sendMessage = "! " + serverToDisconnect.UserName + " " + serverToDisconnect.Password;
             return sendMessageReturn(serverToDisconnect, sendMessage);
         }
         /// <summary>
@@ -70,6 +71,11 @@ namespace DcSharpProject
         public string getUserConnInfo(Server serverToReceive, string srcUsername)
         {
             string sendMessage = "@ " + serverToReceive.UserName + " " + serverToReceive.Password + " " + srcUsername;
+            return sendMessageReturn(serverToReceive, sendMessage);
+        }
+        public string sendHeartbeat(Server serverToReceive)
+        {
+            string sendMessage = "~ " + serverToReceive.UserName + " " + serverToReceive.Password;
             return sendMessageReturn(serverToReceive, sendMessage);
         }
         /// <summary>
@@ -127,11 +133,6 @@ namespace DcSharpProject
             Thread.Sleep(10000);
             listener.Server.Close();
         }
-        /// <summary>
-        /// Sends a logout message to a given server, which contains username and password
-        /// </summary>
-        /// <param name="serverToDisconnect"></param>
-        /// <returns></returns>
 
         
     }
