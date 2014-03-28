@@ -28,7 +28,7 @@ namespace DcSharpProject
         /// <returns>Server message</returns>
         public string loginToServer(Server serverToConnect)
         {
-            string sendMessage = "$ " + serverToConnect.UserName + " " + serverToConnect.Password;
+            string sendMessage = "$|" + serverToConnect.UserName + "|" + serverToConnect.Password;
             return sendMessageReturn(serverToConnect, sendMessage);
         }        
         /// <summary>

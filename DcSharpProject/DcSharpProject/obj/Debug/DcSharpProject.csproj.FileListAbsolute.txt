@@ -22,3 +22,17 @@ C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\m
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\movieicon.png
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\pictureicon.png
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\usericon.png
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.exe.config
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\foldericon.png
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\miscicon.png
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\movieicon.png
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\pictureicon.png
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\usericon.png
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.exe
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.pdb
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.csprojResolveAssemblyReference.cache
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.Form1.resources
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.Properties.Resources.resources
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.csproj.GenerateResource.Cache
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.exe
+C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.pdb

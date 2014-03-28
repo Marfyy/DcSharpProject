@@ -24,7 +24,7 @@ namespace server
         bool listen = true;
         Dictionary<string, string> users = new Dictionary<string, string>();
         Dictionary<string, object> klienter = new Dictionary<string, object>();
-        private TcpListener tcpListener; //A tcplistener.
+        private TcpListener tcpListener = new TcpListener(IPAddress.Any,9999); //A tcplistener.
         private Thread listenThread; //A listenthread
         private Thread heartbeatThread;
         string username;
@@ -42,15 +42,17 @@ namespace server
             timer1.Start();
         }
 
-        public void ListenForClients() //A method that loops aslong as listen is true.
+        //A method that loops aslong as listen is true.
+        public void ListenForClients() 
         {
-            this.tcpListener.Start(); //starts the tcplistener
+            //starts the tcplistener
+            this.tcpListener.Start(); 
 
             while (listen)
             {
                 //blocks until a client has connected to the server
                 TcpClient client = this.tcpListener.AcceptTcpClient();
-                ////create a thread to handle communication 
+                //create a thread to handle communication 
                 //with connected client
                 Thread clientThread = new Thread(new ParameterizedThreadStart(HandleClientComm));
                 clientThread.IsBackground = true;
@@ -91,6 +93,10 @@ namespace server
                 ASCIIEncoding encoder = new ASCIIEncoding();
                 username = (encoder.GetString(message, 0, bytesRead));
                 string[] tmp = username.Split('|');
+                string okMess = "@OK";
+                byte[] okBuff;
+                string nOk = "@NOK";
+                byte[] nokBuff;
                 if (tmp[0] == "$") // Logga in
                 {
 
@@ -103,6 +109,15 @@ namespace server
                             byte[] buffer = encoder.GetBytes(result); //a byte array to store the message in after it has been encoded.
                             clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
                             clientStream.Flush(); //Flushes the stream
+                            okBuff = encoder.GetBytes(okMess);
+                            clientStream.Write(okBuff, 0, okBuff.Length);
+                            clientStream.Flush();
+                        }
+                        else
+                        {
+                            nokBuff = encoder.GetBytes(nOk);
+                            clientStream.Write(nokBuff, 0, nokBuff.Length);
+                            clientStream.Flush();
                         }
                     }
                 }
@@ -111,6 +126,15 @@ namespace server
                     if (!users.ContainsKey(tmp[1]) && !users.ContainsValue(tmp[2]))
                     {
                         users.Add(tmp[1], tmp[2]);
+                        okBuff = encoder.GetBytes(okMess);
+                        clientStream.Write(okBuff, 0, okBuff.Length);
+                        clientStream.Flush();
+                    }
+                    else
+                    {
+                        nokBuff = encoder.GetBytes(nOk);
+                        clientStream.Write(nokBuff, 0, nokBuff.Length);
+                        clientStream.Flush();
                     }
                 }
                 if (tmp[0] == ",") // Skicka klientlistan till servrarna
@@ -120,6 +144,24 @@ namespace server
                         klienter.Add(tmp[1], tmp[2]);
                     }
                 }
+                if (tmp[0] == "!")//Logga ut användaren
+                {
+                    if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
+                    {
+                        klienter.Remove(tmp[1]);
+                        klienter.Remove(test);
+                        okBuff = encoder.GetBytes(okMess);
+                        clientStream.Write(okBuff, 0, okBuff.Length);
+                        clientStream.Flush();
+                    }
+                }
+                if(tmp[0] == "%")
+                {
+                    //skicka lista över klienter till användaren...
+
+
+                }
+               
 
                 clientStream.Flush();
             }
@@ -129,7 +171,7 @@ namespace server
         {
             try
             {
-             TcpClient client = new TcpClient();
+                TcpClient client = new TcpClient();
                 client.Connect(_HostURI,_PortNumber);
                 return true;
             }
@@ -140,6 +182,7 @@ namespace server
             }
             return false;
         }
+
         public void heartbeat()
         {
             string ip = "10.1.1.114";
@@ -150,7 +193,6 @@ namespace server
 
             foreach (var item in test)
             {
-
                 Debug.WriteLine("Compare my port " + port + " against item port " + item);
 
                 if (item > port)
@@ -162,10 +204,10 @@ namespace server
                         Debug.WriteLine("My port is " + port + ", switching to " + item);
                         port = item;
                         //listenThread.Abort();
-                        connect(port);
-                        
+                        connect(port);                       
                     }
                 }
+
                 if(item < port)
                 {
                     bool resultPing = PingHost(ip, item);
@@ -179,17 +221,13 @@ namespace server
                         clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
                         clientStream.Flush();
                     }
-
                 }
             }
+
             heartbeatThread.Abort();
         }
 
-        public void Form1_Load(object sender, EventArgs e)
-        {
-        }
-
-        private void button1_Click(object sender, EventArgs e)
+        private void btn_connClient_Click(object sender, EventArgs e)
         {
             var lines = klienter.Select(kv => kv.Key + ": " + kv.Value.ToString());
             textBox1.Text = string.Join(Environment.NewLine, lines);
@@ -202,6 +240,7 @@ namespace server
             portbox.Enabled = false;
             portbtn.Enabled = false;
         }
+
         private void connect(int port)
         {
             this.tcpListener = new TcpListener(IPAddress.Any, port); //Creates a TCPlistener that listens for any Ipadress but port 9999.
@@ -209,6 +248,7 @@ namespace server
             this.listenThread.IsBackground = true; //Sets the thread to a background process.
             this.listenThread.Start(); //Starts the listenerthread.
         }
+
         private void getservers()
         {
             XDocument xmldoc = XDocument.Load("XMLFile1.xml");

@@ -22,7 +22,7 @@ namespace klient
         protected IPEndPoint serverEndPoint;// = new IPEndPoint(IPAddress.Parse(ip), port); //Defining the ip and port to server for later use.
         private Thread getmessages; //A thread that will be used to continiously read from the server.
         bool connected;
-        //int prevport = 9999;
+        
         public ClientForm()
         {
             InitializeComponent();
@@ -96,6 +96,7 @@ namespace klient
 
             clientStream.Write(buffer, 0, buffer.Length); //sends username to server
             clientStream.Flush(); //flushes the stream.
+            
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -135,6 +136,16 @@ namespace klient
             this.getmessages = new Thread(new ThreadStart(handleservercomm)); //Starts the thread get messages as handleservercomm.
             this.getmessages.IsBackground = true; //Makes it a background process for correct shutdown of program.
             this.getmessages.Start(); //Starts the getmessages.
+        }
+
+        private void btn_logout_Click(object sender, EventArgs e)
+        {
+            string message = "!|" + txt_username.Text + "|" + txt_password.Text;
+            NetworkStream clientStream = client.GetStream(); //creates a networkstream from client.
+            ASCIIEncoding encoder = new ASCIIEncoding(); //ASCII encoder
+            byte[] buffer = encoder.GetBytes(message); //bytearray to store the username message
+            clientStream.Write(buffer, 0, buffer.Length); //sends username to server
+            clientStream.Flush(); //flushes the stream.
         }
     }
 }

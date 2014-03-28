@@ -47,6 +47,7 @@
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.btn_logout = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txt_username
@@ -192,14 +193,22 @@
             this.label7.TabIndex = 16;
             this.label7.Text = "Lösenord:";
             // 
-            // timer1
+            // btn_logout
             // 
+            this.btn_logout.Location = new System.Drawing.Point(108, 422);
+            this.btn_logout.Name = "btn_logout";
+            this.btn_logout.Size = new System.Drawing.Size(71, 23);
+            this.btn_logout.TabIndex = 17;
+            this.btn_logout.Text = "Log out";
+            this.btn_logout.UseVisualStyleBackColor = true;
+            this.btn_logout.Click += new System.EventHandler(this.btn_logout_Click);
             // 
             // ClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(310, 457);
+            this.Controls.Add(this.btn_logout);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.label5);
@@ -245,6 +254,7 @@
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Button btn_logout;
     }
 }
 
