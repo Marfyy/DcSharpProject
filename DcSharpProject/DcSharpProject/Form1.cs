@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,7 +39,13 @@ namespace DcSharpProject
             this.clientListenThread.Start(); //Starts the listenerthread.
             //clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
             Server server = new Server("bajs", "10.1.1.114", 9999, "markus", "hejsan123");
-            serverConn.getCompleteUserListFromServer(server);
+            serverConn.loginToServer(server);
+            serverConn.logoutFromServer(server);
+            //string response = serverConn.getUserConnInfo(server, "Marreman");
+            //BinaryFormatter formatter = new BinaryFormatter();
+            //List<string> userNames = serverConn.getCompleteUserListFromServer(server);
+            //if (userNames != null)
+            //    lstUser.Items.AddRange(userNames.ToArray());
         }
         public void initGUI()
         {

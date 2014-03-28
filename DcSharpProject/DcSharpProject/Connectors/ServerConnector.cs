@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Threading;
 using System.Net;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 //$ = inlogg
 //# = registrering
@@ -38,7 +40,7 @@ namespace DcSharpProject
         /// <returns>Server message</returns>
         public string logoutFromServer(Server serverToDisconnect)
         {
-            string sendMessage = "! " + serverToDisconnect.UserName + " " + serverToDisconnect.Password;
+            string sendMessage = "!|" + serverToDisconnect.UserName + "|" + serverToDisconnect.Password;
             return sendMessageReturn(serverToDisconnect, sendMessage);
         }
         /// <summary>
@@ -48,7 +50,7 @@ namespace DcSharpProject
         /// <returns>Server message</returns>
         public string registerToServer(Server serverToRegister)
         {
-            string sendMessage = "# " + serverToRegister.UserName + " " + serverToRegister.Password;
+            string sendMessage = "#|" + serverToRegister.UserName + "|" + serverToRegister.Password;
             return sendMessageReturn(serverToRegister, sendMessage);
         }
         /// <summary>
@@ -56,10 +58,10 @@ namespace DcSharpProject
         /// </summary>
         /// <param name="serverToReceive"></param>
         /// <returns>if auth checks out, the userlist from the server</returns>
-        public string getCompleteUserListFromServer(Server serverToReceive)
+        public List<string> getCompleteUserListFromServer(Server serverToReceive)
         {
-            string sendMessage = "% " + serverToReceive.UserName + " " + serverToReceive.Password;
-            return sendMessageReturn(serverToReceive, sendMessage);
+            string sendMessage = "%|" + serverToReceive.UserName + "|" + serverToReceive.Password;
+            return sendMessageReturnList(serverToReceive, sendMessage);
         }
 
         /// <summary>
@@ -70,7 +72,7 @@ namespace DcSharpProject
         /// <returns></returns>
         public string getUserConnInfo(Server serverToReceive, string srcUsername)
         {
-            string sendMessage = "@ " + serverToReceive.UserName + " " + serverToReceive.Password + " " + srcUsername;
+            string sendMessage = "@|" + serverToReceive.UserName + "|" + serverToReceive.Password + "|" + srcUsername;
             return sendMessageReturn(serverToReceive, sendMessage);
         }
         public string sendHeartbeat(Server serverToReceive)
@@ -121,6 +123,7 @@ namespace DcSharpProject
                         {
                             done = true;
                             output = buffer;
+                            break;
                         }
 
                         // Nope. Resize the buffer, put in the byte we've just
@@ -135,11 +138,8 @@ namespace DcSharpProject
                     output = new byte[read];
                     Array.Copy(buffer, output, read);
                     message = Encoding.ASCII.GetString(output);
-                    if(!(message.CompareTo(sendMessage.Substring(0, 1) + "OK") == 0) || done)
-                    {
                         server.Close();
                         break;
-                    }
                     
                 }
             }
@@ -148,6 +148,41 @@ namespace DcSharpProject
                 return "Connection failure";
             }
             return message;
+        }
+        public List<string> sendMessageReturnList(Server serverToConnect, string sendMessage)
+        {
+            ASCIIEncoding encoder = new ASCIIEncoding();
+            byte[] IP = encoder.GetBytes(serverToConnect.IP);
+            listener = new TcpListener(IPAddress.Parse(serverToConnect.IP), serverToConnect.Port);
+            MemoryStream outputStream = new MemoryStream();
+            List<string> userNames = new List<string>();
+            string message = "";
+            try
+            {
+                //SEND MESSAGE TO SERVER
+                TcpClient server = new TcpClient(serverToConnect.IP, serverToConnect.Port);
+                NetworkStream stream = server.GetStream();
+               
+                byte[] bMessage = encoder.GetBytes(sendMessage);
+                stream.Write(bMessage, 0, bMessage.Length);
+                stream.Flush();
+                BinaryFormatter formatter = new BinaryFormatter();
+                userNames = new List<string>();
+                userNames = (List<string>)formatter.Deserialize(stream);
+                //while(true)
+                //{
+                //    if(stream.DataAvailable)
+                //    {
+                //        stream.CopyTo(outputStream);
+                //        break;
+                //    }
+                //}
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            return userNames;
         }
         /// <summary>
         /// Creates a 10 second delay, then terminates the listener. Used for ack packages from server
