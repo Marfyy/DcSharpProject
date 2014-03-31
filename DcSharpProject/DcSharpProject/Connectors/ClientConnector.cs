@@ -18,6 +18,7 @@ namespace DcSharpProject
 
         public string sendFileDownloadRequest(Client client, string fileRequested)
         {
+            //Fixa så en port kommer med också
             string sendMessage = "! " + fileRequested;
             return sendMessageReturn(client, sendMessage);
         }
@@ -52,13 +53,12 @@ namespace DcSharpProject
             file.CopyTo(receiverStream);
         }
 
-        public void sendUserDirectory(User user, Client client)
+        public void sendUserDirectory(User user, TcpClient client)
         {
             MemoryStream stream = user.getDirectoryData();
-            TcpClient receiverClient = new TcpClient(client.IP, client.Port);
-            NetworkStream receiverStream = receiverClient.GetStream();
+            NetworkStream receiverStream = client.GetStream();
             stream.Seek(0, SeekOrigin.Begin);
-            stream.CopyTo(receiverStream, receiverClient.ReceiveBufferSize);
+            stream.CopyTo(receiverStream, client.ReceiveBufferSize);
         }
         private string sendMessageReturn(Client clientToConnect, string sendMessage)
         {

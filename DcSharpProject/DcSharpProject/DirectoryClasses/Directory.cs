@@ -18,6 +18,10 @@ namespace DcSharpProject
         {
             this.folders = folders;
         }
+        public void addFolder(Folder folder)
+        {
+            this.folders.Add(folder);
+        }
         public Folder[] getFolders()
         {
             return folders.ToArray();

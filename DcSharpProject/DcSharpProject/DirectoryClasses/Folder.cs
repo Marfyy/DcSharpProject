@@ -10,22 +10,22 @@ namespace DcSharpProject
     class Folder
     {
         public string Name { get; private set; }
-        public List<string> files;
+        public List<dirFile> files;
         public Folder(string name)
         {
             this.Name = name;
-            this.files = new List<string>();
+            this.files = new List<dirFile>();
         }
-        public Folder(string name, List<string> files)
+        public Folder(string name, List<dirFile> files)
         {
             this.Name = name;
             this.files = files;
         }
-        public void addFile(string fileName)
+        public void addFile(dirFile file)
         {
-            files.Add(fileName);
+            files.Add(file);
         }
-        public string[] getFiles()
+        public dirFile[] getFiles()
         {
             return files.ToArray();
         }

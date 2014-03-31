@@ -24,7 +24,6 @@ namespace DcSharpProject
             this.Name = name;
             this.SharedFiles = sharedFiles;
         }
-
         public void updateDirectoryData(MemoryStream rawDirData)
         {
             BinaryFormatter formatter = new BinaryFormatter();

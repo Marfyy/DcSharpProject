@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml;
 namespace DcSharpProject
 {
     //Serverport = 9999;
@@ -19,9 +20,10 @@ namespace DcSharpProject
     //ClientFileTransferPortWindow = 9001-9998; När en filöverföring initieras, både upp och ner, ska denna överföringen tilldelas en egen port, dvs en egen listener och tråd
     public partial class Form1 : Form
     {
+        User self;
         TcpListener tcpClientListener;
         Thread clientListenThread;
-
+        PortHandler portHandler;
         ServerConnector serverConn;
         ClientConnector clientConn;
         List<Server> connectedServers;
@@ -30,17 +32,41 @@ namespace DcSharpProject
         {
             InitializeComponent();
             initGUI();
+            XmlDocument xml = new XmlDocument();
+            xml.Load(@"userConfig.xml");
+            XmlElement root = xml.DocumentElement;
+            this.self = new User(root.Attributes["name"].Value.ToString()); 
+            Directory selfDir = new Directory();
+            XmlNodeList subroot = root.SelectNodes("folder");
+
+            for(int i = 0; i < subroot.Count; i++)
+            {
+                XmlNode elem = subroot.Item(i);
+                Folder folder = new Folder(elem.Attributes["name"].Value.ToString());
+                XmlNodeList fileList = elem.SelectNodes("file");
+                for(int j = 0; j < fileList.Count; j++)
+                {
+                    XmlNode fileXML = fileList.Item(j);
+                    dirFile file = new dirFile(fileXML.Attributes["name"].Value.ToString(), int.Parse(fileXML.Attributes["size"].Value.ToString()), fileXML.Attributes["URL"].Value.ToString());
+                    folder.addFile(file);
+                }
+                selfDir.addFolder(folder);
+            }
+            self.SharedFiles = selfDir;
+            portHandler = new PortHandler();
             serverConn = new ServerConnector();
             clientConn = new ClientConnector();
             connectedServers = new List<Server>();
-            this.tcpClientListener = new TcpListener(IPAddress.Any, 9000); //Creates a TCPlistener that listens for any Ipadress and port 9000.
-            this.clientListenThread = new Thread(new ThreadStart(clientListener)); //New thread that will listen for clients.
+            this.tcpClientListener = new TcpListener(IPAddress.Any, portHandler.clientRequestPort); //Creates a TCPlistener that listens for any Ipadress and port 9000.
+            this.clientListenThread = new Thread(new ThreadStart(clientRequestListener)); //New thread that will listen for clients.
             this.clientListenThread.IsBackground = true; //Sets the thread to a background process.
             this.clientListenThread.Start(); //Starts the listenerthread.
+
+
             //clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
             Server server = new Server("bajs", "10.1.1.114", 9999, "markus", "hejsan123");
             serverConn.loginToServer(server);
-            serverConn.logoutFromServer(server);
+            //serverConn.logoutFromServer(server);
             //string response = serverConn.getUserConnInfo(server, "Marreman");
             //BinaryFormatter formatter = new BinaryFormatter();
             //List<string> userNames = serverConn.getCompleteUserListFromServer(server);
@@ -58,7 +84,7 @@ namespace DcSharpProject
         /// <summary>
         /// This method runs always, to catch any messages that another client sends to you. For example request for user dir, request for start download
         /// </summary>
-        public void clientListener() //A method that loops aslong as listen is true.
+        public void clientRequestListener() //A method that loops aslong as listen is true.
         {
             this.tcpClientListener.Start(); //starts the tcplistener
 
@@ -72,7 +98,7 @@ namespace DcSharpProject
                 clientThread.Start(client);
             }
         }
-        public void startClientListener(Client client, int clientPort, int transferID)
+        public void startClientRequestListener(Client client, int clientPort, int transferID)
         {
             TcpListener listener = new TcpListener(IPAddress.Parse(client.IP), clientPort);
             listener.Start();
@@ -149,7 +175,7 @@ namespace DcSharpProject
         {
             
         }
-        public void HandleClientConn(object client) //This method handels the incoming messages.
+        public void HandleClientConn(object client) //This method handels the incoming request messages from clients.
         {
             TcpClient tcpClient = (TcpClient)client; //New tcp client
             NetworkStream clientStream = tcpClient.GetStream(); //new networkstream
@@ -190,9 +216,18 @@ namespace DcSharpProject
                 //Buffer is now too big. Shrink it.
                 output = new byte[read];
                 Array.Copy(buffer, output, read);              
-
-
                 tcpClient.Close();
+                string sOutput = Encoding.ASCII.GetString(output);
+                if(sOutput.StartsWith("!")) //Request dir info
+                {
+                    clientConn.sendUserDirectory(self, tcpClient);
+                }
+                else if(sOutput.StartsWith("@")) //Request file download
+                {
+                    //receive file request with port
+                    //Send ok back with filename, filesize
+                    //start sending the file to given port
+                }
                 break;
             }
         }
@@ -223,9 +258,9 @@ namespace DcSharpProject
             List<Folder> folders = new List<Folder>();
             folders.Add(new Folder("asdf1"));
             folders.Add(new Folder("asdf2"));
-            folders[0].addFile("fdsa1.jpg");
-            folders[0].addFile("fdsa2.avi");
-            folders[1].addFile("fdsa3.exe");
+            //folders[0].addFile("fdsa1.jpg");
+            //folders[0].addFile("fdsa2.avi");
+            //folders[1].addFile("fdsa3.exe");
             user.SharedFiles = new Directory(folders);
             return user;
         }
@@ -244,22 +279,22 @@ namespace DcSharpProject
                 for (int j = 0; j < nrOfFiles; j++)
                 {
                     imageindex = -1;
-                    if (user.SharedFiles.folders[i].files[j].EndsWith(".jpg") == true || user.SharedFiles.folders[i].files[j].EndsWith(".jpeg") == true || user.SharedFiles.folders[i].files[j].EndsWith(".bmp") == true || user.SharedFiles.folders[i].files[j].EndsWith(".gif") == true || user.SharedFiles.folders[i].files[j].EndsWith(".png") == true)
+                    if (user.SharedFiles.folders[i].files[j].Name.EndsWith(".jpg") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".jpeg") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".bmp") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".gif") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".png") == true)
                     {
                         imageindex = 2;
                     }
-                    else if (user.SharedFiles.folders[i].files[j].EndsWith(".exe") == true)
+                    else if (user.SharedFiles.folders[i].files[j].Name.EndsWith(".exe") == true)
                     {
                         imageindex = 4;
                     }
-                    else if (user.SharedFiles.folders[i].files[j].EndsWith(".avi") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mov") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mp4") == true || user.SharedFiles.folders[i].files[j].EndsWith(".wmv") == true || user.SharedFiles.folders[i].files[j].EndsWith(".flv") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mpg") == true || user.SharedFiles.folders[i].files[j].EndsWith(".mkv") == true)
+                    else if (user.SharedFiles.folders[i].files[j].Name.EndsWith(".avi") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".mov") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".mp4") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".wmv") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".flv") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".mpg") == true || user.SharedFiles.folders[i].files[j].Name.EndsWith(".mkv") == true)
                     {
                         imageindex = 3;
                     }
                     else
                         imageindex = 3;
 
-                    tempFolder[j] = new TreeNode(user.SharedFiles.folders[i].files[j], imageindex, imageindex);
+                    tempFolder[j] = new TreeNode(user.SharedFiles.folders[i].files[j].Name, imageindex, imageindex);
                 }
                 folders[i] = new TreeNode(user.SharedFiles.folders[i].Name, 1, 1);
                 folders[i].Nodes.AddRange(tempFolder);
@@ -283,7 +318,7 @@ namespace DcSharpProject
                 {
                     split = clientRequestResponse.Split(new char[] { ' ' });
                     listenerPort = int.Parse(split[1]);
-                    startClientListener(clientToConnect, listenerPort, 0);
+                    startClientRequestListener(clientToConnect, listenerPort, 0);
                 }
             }
             else if (serverResponse.StartsWith("@NOK"))

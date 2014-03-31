@@ -6,14 +6,18 @@ using System.Threading.Tasks;
 
 namespace DcSharpProject
 {
-    class PortHandler
+    public class PortHandler
     {
+        public int clientRequestPort = 9000;
+        public int serverRequestPort = 9999;
+        public int clientDataPortMin = 9001;
+        public int clientDataPortMax = 9998;
         private List<int> ports;
         private List<int> usedPorts;
         public PortHandler()
         {
             ports = new List<int>();
-            for (int i = 9000; i < 9999; i++)
+            for (int i = clientDataPortMin; i <= clientDataPortMax; i++)
             {
                 ports.Add(i);
             }
