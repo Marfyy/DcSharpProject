@@ -37,7 +37,7 @@ namespace DcSharpProject
             {
                 for(int j = 0; j < SharedFiles.folders[i].files.Count; j++)
                 {
-                    if (URL.CompareTo(SharedFiles.folders[i].files[j].URL) == 0)
+                    if (URL.CompareTo(SharedFiles.folders[i].files[j].internalURL) == 0)
                     {
                         output = SharedFiles.folders[i].files[j];
                         break;

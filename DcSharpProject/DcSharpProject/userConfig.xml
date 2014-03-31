@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <user name="Martin">
   <folder name="Filmer">
-    <file name="Avatar.avi" size="345" URL="C:\Filmer\Avatar.avi"></file>
-    <file name="AceVentura1.avi" size="345" URL="C:\Filmer\AceVentura1.avi"></file>
-    <file name="Moon.avi" size="345" URL="C:\Filmer\Moon.avi"></file>
+    <file name="Avatar.avi" size="345" intURL="Filmer\Avatar.avi" realURL="C:\Filmer\Avatar.avi"></file>
+    <file name="AceVentura1.avi" size="345" intURL="Filmer\AceVentura1.avi" realURL="C:\Filmer\AceVentura1.avi"></file>
+    <file name="Moon.avi" size="345" intURL="Filmer\Moon.avi" realURL="C:\Filmer\Moon.avi"></file>
   </folder>
 </user>

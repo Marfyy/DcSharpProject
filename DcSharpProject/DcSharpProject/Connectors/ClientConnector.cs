@@ -16,21 +16,21 @@ namespace DcSharpProject
     {
         TcpListener listener;
 
-        public string sendFileDownloadRequest(Client client, string fileRequested)
+        public string sendFileDownloadRequest(Client client, string fileRequested, int port)
         {
             //Fixa så en port kommer med också
-            string sendMessage = "!|" + fileRequested;
+            string sendMessage = "!|" + fileRequested + "|" + port;
             return sendMessageReturn(client, sendMessage);
         }
-        public string sendFileDownloadResponse(Client client, string message)
+        public string sendFileDownloadResponse(TcpClient client, string message)
         {
             string sendMessage = "%" + message;
-            return sendMessageReturn(client, sendMessage);
+            return sendMessageNoReturn(client, sendMessage); //"OK|"+file.internalURL + "|" + file.sizeMB;
         }
-        public string sendDirectoryRequest(Client client)
+        public NetworkStream sendDirectoryRequest(Client client)
         {
             string sendMessage = "@";
-            return sendMessageReturn(client, sendMessage);
+            return sendMessageReturnStream(client, sendMessage);
         }
         public void sendFile(string URI, int offset, Client client)
         {
@@ -64,6 +64,23 @@ namespace DcSharpProject
             NetworkStream receiverStream = client.GetStream();
             stream.Seek(0, SeekOrigin.Begin);
             stream.CopyTo(receiverStream, client.ReceiveBufferSize);
+        }
+        private string sendMessageNoReturn(TcpClient clientToSend, string sendMessage)
+        {
+            string output = null;
+            try
+            {
+                ASCIIEncoding encoder = new ASCIIEncoding();
+                NetworkStream stream = clientToSend.GetStream();
+                byte[] bMessage = encoder.GetBytes(sendMessage);
+                stream.Write(bMessage, 0, bMessage.Length);
+                stream.Flush();
+            }
+            catch (Exception e)
+            {
+                output = e.Message;
+            }
+            return output;
         }
         private string sendMessageReturn(Client clientToConnect, string sendMessage)
         {
@@ -104,6 +121,35 @@ namespace DcSharpProject
                 return "Connection failure";
             }
             return message;
+        }
+        private NetworkStream sendMessageReturnStream(Client clientToConnect, string sendMessage)
+        {
+            ASCIIEncoding encoder = new ASCIIEncoding();
+            byte[] IP = encoder.GetBytes(clientToConnect.IP);
+            listener = new TcpListener(IPAddress.Parse(clientToConnect.IP), clientToConnect.Port);
+            try
+            {
+                //SEND MESSAGE TO SERVER
+                TcpClient server = new TcpClient(clientToConnect.IP, clientToConnect.Port);
+                NetworkStream stream = server.GetStream();
+                byte[] bMessage = encoder.GetBytes(sendMessage);
+                stream.Write(bMessage, 0, bMessage.Length);
+                stream.Flush();
+
+                //RECIEVE RESPONSE FROM SERVER
+                listener.Start();
+                Thread timeoutThread = new Thread(new ThreadStart(AuthenticationTimeout)); //Makes the client wait 10 seconds for the server to respond to the message, else abort
+                timeoutThread.Start();
+                server = listener.AcceptTcpClient();
+                timeoutThread.Abort();
+                stream = server.GetStream();
+                return stream;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            
         }
         /// <summary>
         /// Creates a 10 second delay, then terminates the listener. Used for ack packages from server

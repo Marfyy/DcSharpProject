@@ -21,17 +21,23 @@ namespace DcSharpProject
     public partial class Form1 : Form
     {
         User self;
+        User selectedUser;
         TcpListener tcpClientListener;
         Thread clientListenThread;
         PortHandler portHandler;
         ServerConnector serverConn;
         ClientConnector clientConn;
         List<Server> connectedServers;
+
+        List<FileUpload> activeUploads;
+        List<FileDownload> activeDownloads;
         bool listen = true;
         public Form1()
         {
             InitializeComponent();
             initGUI();
+            activeUploads = new List<FileUpload>();
+            activeDownloads = new List<FileDownload>();
             XmlDocument xml = new XmlDocument();
             xml.Load(@"userConfig.xml");
             XmlElement root = xml.DocumentElement;
@@ -47,7 +53,7 @@ namespace DcSharpProject
                 for(int j = 0; j < fileList.Count; j++)
                 {
                     XmlNode fileXML = fileList.Item(j);
-                    dirFile file = new dirFile(fileXML.Attributes["name"].Value.ToString(), int.Parse(fileXML.Attributes["size"].Value.ToString()), fileXML.Attributes["URL"].Value.ToString());
+                    dirFile file = new dirFile(fileXML.Attributes["name"].Value.ToString(), int.Parse(fileXML.Attributes["size"].Value.ToString()), fileXML.Attributes["intURL"].Value.ToString(), fileXML.Attributes["realURL"].Value.ToString());
                     folder.addFile(file);
                 }
                 selfDir.addFolder(folder);
@@ -65,7 +71,7 @@ namespace DcSharpProject
 
             //clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
             Server server = new Server("bajs", "10.1.1.114", 9999, "markus", "hejsan123");
-            serverConn.loginToServer(server);
+            //serverConn.loginToServer(server);
             //serverConn.logoutFromServer(server);
             //string response = serverConn.getUserConnInfo(server, "Marreman");
             //BinaryFormatter formatter = new BinaryFormatter();
@@ -98,24 +104,7 @@ namespace DcSharpProject
                 clientThread.Start(client);
             }
         }
-        public void startClientRequestListener(Client client, int clientPort, int transferID)
-        {
-            TcpListener listener = new TcpListener(IPAddress.Parse(client.IP), clientPort);
-            listener.Start();
 
-            TcpClient remoteClient = listener.AcceptTcpClient();
-            Thread clientThread;
-            if (transferID == 0) //directory information download
-            {
-                clientThread = new Thread(new ParameterizedThreadStart(HandleUserDirectoryData));
-                clientThread.Start(remoteClient);
-            }
-            else if(transferID == 1) //file download
-            {
-                clientThread = new Thread(new ParameterizedThreadStart(HandleFileDownloadData));
-                clientThread.Start(remoteClient);
-            }
-        }
         public void HandleUserDirectoryData(object client)
         {
             TcpClient tcpClient = (TcpClient)client; //New tcp client
@@ -230,11 +219,43 @@ namespace DcSharpProject
                     string[] split = sOutput.Split(new char[] { '|' });
                     string fileURL = split[1];
                     int requestedPort = int.Parse(split[2]);
+                    dirFile file = self.getFile(fileURL);
+                    if(file != null)
+                    {
+                        Client sendClient = new Client(tcpClient.Client.RemoteEndPoint);
+                        sendClient.Port = requestedPort;
+                        string message = "OK|"+file.internalURL + "|" + file.sizeMB;
+                        clientConn.sendFileDownloadResponse(tcpClient, message); //Send back OK
+
+                        Thread fileTransferThread = new Thread(new ParameterizedThreadStart(clientSendFile));
+                        FileUpload upload = new FileUpload(file.internalURL, sendClient);
+                        fileTransferThread.Start(upload);
+                        
+                    }
                 }
                 break;
             }
         }
-        public void clientSendFile(object client)
+        public void clientSendFile(object fileUpload)
+        {
+            FileUpload upload = (FileUpload)fileUpload;
+            activeUploads.Add(upload);
+            clientConn.sendFile(upload.fileURL, 0, upload.connectedClient); //Send file
+            for(int i = 0; i < activeUploads.Count; i++) //Finds the upload amongst the active ones and marks it done
+            {
+                if (activeUploads.ElementAt(i).fileURL == upload.fileURL)
+                {
+                    activeUploads.ElementAt(i).Done();
+                    break;
+                }
+            }
+            updateUploadList(); //Updates the upload list with the new status
+        }
+        public void updateUploadList()
+        {
+            
+        }
+        public void updateDownloadList()
         {
             
         }
@@ -311,17 +332,17 @@ namespace DcSharpProject
             string userName = (string)lstUser.SelectedItem;
             string serverResponse = serverConn.getUserConnInfo(connectedServers[cmbServer.SelectedIndex], userName);
             Client clientToConnect;
-            int listenerPort;
             if (serverResponse.StartsWith("@OK"))
             {
-                string[] split = serverResponse.Split(new char[] { ' ' });
+                string[] split = serverResponse.Split(new char[] { '|' });
                 clientToConnect = new Client(split[1], int.Parse(split[2]));
-                string clientRequestResponse = clientConn.sendDirectoryRequest(clientToConnect);
-                if(clientRequestResponse.StartsWith("@OK"))
+                NetworkStream clientRequestResponse = clientConn.sendDirectoryRequest(clientToConnect);
+                if(clientRequestResponse != null)
                 {
-                    split = clientRequestResponse.Split(new char[] { ' ' });
-                    listenerPort = int.Parse(split[1]);
-                    startClientRequestListener(clientToConnect, listenerPort, 0);
+                    selectedUser = new User(lstUser.SelectedItem.ToString());
+                    MemoryStream stream = new MemoryStream();
+                    clientRequestResponse.CopyTo(stream);
+                    selectedUser.updateDirectoryData(stream);
                 }
             }
             else if (serverResponse.StartsWith("@NOK"))
@@ -329,6 +350,41 @@ namespace DcSharpProject
             else
             {
                 MessageBox.Show("Connection failed");
+            }
+        }
+        private void userDirTreeView_DoubleClick(object sender, EventArgs e)
+        {
+            if (userDirTreeView.SelectedNode.Nodes.Count == 0) //Selected item is a file and not a folder or user
+            {
+                string url = userDirTreeView.SelectedNode.Parent.Text + "\\" + userDirTreeView.SelectedNode.Text;
+                string userName = (string)lstUser.SelectedItem;
+                string serverResponse = serverConn.getUserConnInfo(connectedServers[cmbServer.SelectedIndex], userName);
+                Client clientToConnect;
+                int port = portHandler.getPort();
+                if (serverResponse.StartsWith("@OK"))
+                {
+                    string[] split = serverResponse.Split(new char[] { '|' });
+                    clientToConnect = new Client(split[1], int.Parse(split[2]));
+                    string clientRequestResponse = clientConn.sendFileDownloadRequest(clientToConnect, url, port);
+                    if (clientRequestResponse.CompareTo("Connection failed") != 0)
+                    {
+                        if(clientRequestResponse.StartsWith("%OK")) //Confirms that other user accepted the download request
+                        {
+                            split = clientRequestResponse.Split(new char[] { '|' });
+                            FileDownload download = new FileDownload();
+                            download.file.internalURL = split[1];
+                            download.file.sizeMB = int.Parse(split[2]);
+                        }
+                    }
+
+                    portHandler.recyclePort(port);
+                }
+                else if (serverResponse.StartsWith("@NOK"))
+                    MessageBox.Show("That user does not exist");
+                else
+                {
+                    MessageBox.Show("Connection failed");
+                }
             }
         } 
     }
