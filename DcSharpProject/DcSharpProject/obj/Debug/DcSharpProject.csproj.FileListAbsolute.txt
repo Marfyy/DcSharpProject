@@ -36,3 +36,4 @@ C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\ob
 C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.csproj.GenerateResource.Cache
 C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.exe
 C:\Users\Martin\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.pdb
+C:\Users\Hampus\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\DcSharpProject.exe.config
