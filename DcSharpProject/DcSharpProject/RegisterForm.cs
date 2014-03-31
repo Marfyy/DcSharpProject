@@ -12,9 +12,26 @@ namespace DcSharpProject
 {
     public partial class RegisterForm : Form
     {
+        
+
         public RegisterForm()
         {
             InitializeComponent();
+            
+        }
+
+        private void btnRegisterNewAcc_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtBoxRegisterUserPass.Text) || string.IsNullOrEmpty(txtBoxRegisterUserName.Text))
+            {
+                MessageBox.Show("Please fill out your desired Username and Password", "Error",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                
+                
+            }
         }
     }
 }

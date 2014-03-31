@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DcSharpProject
 {
     
-    class User
+    public class User
     {
         public string Name { get; private set; }
         public Directory SharedFiles { get; set; }

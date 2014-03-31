@@ -9,13 +9,13 @@ namespace DcSharpProject
     /// <summary>
     /// Stores the information about a server that the client is connected to.
     /// </summary>
-    class Server
+    public class Server
     {
-        public string Name { get; private set; }
-        public string IP { get; private set; }
-        public int Port { get; private set; }
-        public string UserName { get; private set; }
-        public string Password { get; private set; }
+        public string Name { get; set; }
+        public string IP { get; set; }
+        public int Port { get; set; }
+        public string UserName { get; set; }
+        public string Password { get; set; }
         public List<User> users;
 
         public Server(string name, string IP, int port, string username, string password)

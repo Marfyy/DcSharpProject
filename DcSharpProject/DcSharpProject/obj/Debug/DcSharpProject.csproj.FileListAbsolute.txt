@@ -40,3 +40,11 @@ C:\Users\Hampus\Documents\GitHub\DcSharpProject\DcSharpProject\DcSharpProject\bi
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\userConfig.xml
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.LoginForm.resources
 C:\DcSharpProject\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.RegisterForm.resources
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\foldericon.png
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\miscicon.png
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\movieicon.png
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\pictureicon.png
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\icons\usericon.png
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\bin\Debug\userConfig.xml
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.LoginForm.resources
+D:\Program\Git\Gitmapp\DcSharpProject\DcSharpProject\DcSharpProject\obj\Debug\DcSharpProject.RegisterForm.resources

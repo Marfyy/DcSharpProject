@@ -75,6 +75,7 @@
             this.btnRegisterNewAcc.TabIndex = 4;
             this.btnRegisterNewAcc.Text = "Register";
             this.btnRegisterNewAcc.UseVisualStyleBackColor = true;
+            this.btnRegisterNewAcc.Click += new System.EventHandler(this.btnRegisterNewAcc_Click);
             // 
             // RegisterForm
             // 
