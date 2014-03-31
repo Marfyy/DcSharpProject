@@ -29,6 +29,7 @@ namespace server
         private Thread heartbeatThread;
         string username;
         int port;
+        string ip = "10.1.1.114";
 
         public ServerForm()
         {
@@ -38,8 +39,31 @@ namespace server
             users.Add("markus", "hejsan123");
             users.Add("martin", "hejsan321");
             getservers();
+            SetPort(ip, 9999);
             timer1.Interval = 19000;
             timer1.Start();
+        }
+
+        public void SetPort(string ip, int port1)
+        {
+            if(PingHost(ip,port1))
+            {
+                port1--;
+                if (port1 == 9994)
+                {
+                    MessageBox.Show("All ports are taken");
+                    Environment.Exit(1);
+                }
+                else
+                    SetPort(ip, port1);
+            }
+            else
+            {
+                port = port1;
+                connect(port);
+                lbn_port1.Text = port.ToString();
+                return;
+            }
         }
 
         //A method that loops aslong as listen is true.
@@ -279,14 +303,6 @@ namespace server
         {
             var lines = klienter.Select(kv => kv.Key + ": " + kv.Value.ToString());
             textBox1.Text = string.Join(Environment.NewLine, lines);
-        }
-
-        private void portbtn_Click(object sender, EventArgs e)
-        {
-            port = int.Parse(portbox.Text);
-            connect(port);
-            portbox.Enabled = false;
-            portbtn.Enabled = false;
         }
 
         private void connect(int port)
