@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace DcSharpProject
 {
     [Serializable]
-    class dirFile
+    public class dirFile
     {
         public string Name { get; set; }
         public int sizeMB { get; set; }

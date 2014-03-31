@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace DcSharpProject
 {
     [Serializable]
-    class Folder
+    public class Folder
     {
         public string Name { get; private set; }
         public List<dirFile> files;

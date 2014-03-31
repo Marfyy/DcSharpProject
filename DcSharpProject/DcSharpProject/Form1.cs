@@ -28,6 +28,8 @@ namespace DcSharpProject
         ClientConnector clientConn;
         List<Server> connectedServers;
         bool listen = true;
+        LoginForm login;
+
         public Form1()
         {
             InitializeComponent();
@@ -38,6 +40,7 @@ namespace DcSharpProject
             this.self = new User(root.Attributes["name"].Value.ToString()); 
             Directory selfDir = new Directory();
             XmlNodeList subroot = root.SelectNodes("folder");
+            login = new LoginForm();
 
             for(int i = 0; i < subroot.Count; i++)
             {
@@ -65,7 +68,7 @@ namespace DcSharpProject
 
             //clientConn.sendCompleteFile(@"C:\Users\Martin\Videos\Inside Zone Techniques.mp4", new Client("127.0.0.1", 9999));
             Server server = new Server("bajs", "10.1.1.114", 9999, "markus", "hejsan123");
-            serverConn.loginToServer(server);
+            //serverConn.loginToServer(server);
             //serverConn.logoutFromServer(server);
             //string response = serverConn.getUserConnInfo(server, "Marreman");
             //BinaryFormatter formatter = new BinaryFormatter();
@@ -245,8 +248,44 @@ namespace DcSharpProject
 
         private void btnConnect_Click(object sender, EventArgs e)
         {
-            Server server = new Server("asdf", "213.100.234.13", 9999, "asdf", "asdf");
-            string serverMessage = serverConn.loginToServer(server);
+
+            login.ShowDialog();
+
+            if (login.status)
+            {
+                Server server = login.getserver();
+                string serverMessage = serverConn.loginToServer(server);
+                if (serverMessage == "Connection failure")
+                {
+                    MessageBox.Show("Could not connect to server", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                if (serverMessage == "@NOK")
+                {
+                    MessageBox.Show("Login information is not correct", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else if(login.status == false)
+            {
+                Server server = login.getserver();
+                string serverMessage = serverConn.registerToServer(server);
+                if (serverMessage == "Connection failure")
+                {
+                    MessageBox.Show("Could not connect to server", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                if (serverMessage == "@NOK")
+                {
+                    MessageBox.Show("Login information is not correct", "Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            
+
+
+
+
         }
         /// <summary>
         /// tempuser
