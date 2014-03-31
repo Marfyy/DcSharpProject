@@ -48,6 +48,14 @@
             this.btnConnect = new System.Windows.Forms.Button();
             this.lstSprServer = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.tabDownloads.SuspendLayout();
             this.tabUser.SuspendLayout();
             this.tabDC.SuspendLayout();
@@ -56,6 +64,14 @@
             // 
             // tabDownloads
             // 
+            this.tabDownloads.Controls.Add(this.label14);
+            this.tabDownloads.Controls.Add(this.label13);
+            this.tabDownloads.Controls.Add(this.label12);
+            this.tabDownloads.Controls.Add(this.label11);
+            this.tabDownloads.Controls.Add(this.label10);
+            this.tabDownloads.Controls.Add(this.label9);
+            this.tabDownloads.Controls.Add(this.label8);
+            this.tabDownloads.Controls.Add(this.label7);
             this.tabDownloads.Controls.Add(this.lstUploads);
             this.tabDownloads.Controls.Add(this.label6);
             this.tabDownloads.Controls.Add(this.lstDownloads);
@@ -71,7 +87,7 @@
             // lstUploads
             // 
             this.lstUploads.FormattingEnabled = true;
-            this.lstUploads.Location = new System.Drawing.Point(26, 250);
+            this.lstUploads.Location = new System.Drawing.Point(26, 278);
             this.lstUploads.Name = "lstUploads";
             this.lstUploads.Size = new System.Drawing.Size(927, 186);
             this.lstUploads.TabIndex = 6;
@@ -80,11 +96,11 @@
             // 
             this.label6.AutoSize = true;
             this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label6.Location = new System.Drawing.Point(22, 226);
+            this.label6.Location = new System.Drawing.Point(3, 234);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(72, 20);
+            this.label6.Size = new System.Drawing.Size(129, 20);
             this.label6.TabIndex = 5;
-            this.label6.Text = "Uploads:";
+            this.label6.Text = "Current Uploads:";
             // 
             // lstDownloads
             // 
@@ -98,11 +114,11 @@
             // 
             this.label5.AutoSize = true;
             this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(22, 23);
+            this.label5.Location = new System.Drawing.Point(7, 3);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(92, 20);
+            this.label5.Size = new System.Drawing.Size(149, 20);
             this.label5.TabIndex = 3;
-            this.label5.Text = "Downloads:";
+            this.label5.Text = "Current Downloads:";
             // 
             // tabUser
             // 
@@ -246,6 +262,78 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Super Server:";
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(23, 31);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(35, 13);
+            this.label7.TabIndex = 7;
+            this.label7.Text = "Name";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(298, 31);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(27, 13);
+            this.label8.TabIndex = 8;
+            this.label8.Text = "Size";
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(736, 31);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(33, 13);
+            this.label9.TabIndex = 9;
+            this.label9.Text = "Done";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(458, 31);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(43, 13);
+            this.label10.TabIndex = 10;
+            this.label10.Text = "Filetype";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(23, 262);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(35, 13);
+            this.label11.TabIndex = 11;
+            this.label11.Text = "Name";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(298, 262);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(27, 13);
+            this.label12.TabIndex = 12;
+            this.label12.Text = "Size";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(458, 262);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(43, 13);
+            this.label13.TabIndex = 13;
+            this.label13.Text = "Filetype";
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(736, 262);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(33, 13);
+            this.label14.TabIndex = 14;
+            this.label14.Text = "Done";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -286,6 +374,14 @@
         private System.Windows.Forms.Button btnDisconnect;
         private System.Windows.Forms.TreeView userDirTreeView;
         private System.Windows.Forms.ImageList dirIconList;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label7;
     }
 }
 

@@ -31,19 +31,18 @@
             this.components = new System.ComponentModel.Container();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.btn_connClient = new System.Windows.Forms.Button();
-            this.portbtn = new System.Windows.Forms.Button();
-            this.portbox = new System.Windows.Forms.TextBox();
-            this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.lst_serverlist = new System.Windows.Forms.ListBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.btn_exitServer = new System.Windows.Forms.Button();
+            this.lb_port = new System.Windows.Forms.Label();
+            this.lbn_port1 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(15, 68);
+            this.textBox1.Location = new System.Drawing.Point(12, 25);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(213, 290);
@@ -51,7 +50,7 @@
             // 
             // btn_connClient
             // 
-            this.btn_connClient.Location = new System.Drawing.Point(15, 364);
+            this.btn_connClient.Location = new System.Drawing.Point(12, 321);
             this.btn_connClient.Name = "btn_connClient";
             this.btn_connClient.Size = new System.Drawing.Size(112, 23);
             this.btn_connClient.TabIndex = 1;
@@ -59,36 +58,10 @@
             this.btn_connClient.UseVisualStyleBackColor = true;
             this.btn_connClient.Click += new System.EventHandler(this.btn_connClient_Click);
             // 
-            // portbtn
-            // 
-            this.portbtn.Location = new System.Drawing.Point(153, 9);
-            this.portbtn.Name = "portbtn";
-            this.portbtn.Size = new System.Drawing.Size(75, 23);
-            this.portbtn.TabIndex = 2;
-            this.portbtn.Text = "Set port";
-            this.portbtn.UseVisualStyleBackColor = true;
-            this.portbtn.Click += new System.EventHandler(this.portbtn_Click);
-            // 
-            // portbox
-            // 
-            this.portbox.Location = new System.Drawing.Point(47, 11);
-            this.portbox.Name = "portbox";
-            this.portbox.Size = new System.Drawing.Size(100, 20);
-            this.portbox.TabIndex = 3;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 15);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(29, 13);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Port:";
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 52);
+            this.label2.Location = new System.Drawing.Point(12, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(93, 13);
             this.label2.TabIndex = 5;
@@ -97,7 +70,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(262, 52);
+            this.label3.Location = new System.Drawing.Point(244, 9);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(50, 13);
             this.label3.TabIndex = 7;
@@ -106,7 +79,7 @@
             // lst_serverlist
             // 
             this.lst_serverlist.FormattingEnabled = true;
-            this.lst_serverlist.Location = new System.Drawing.Point(247, 69);
+            this.lst_serverlist.Location = new System.Drawing.Point(247, 25);
             this.lst_serverlist.Name = "lst_serverlist";
             this.lst_serverlist.Size = new System.Drawing.Size(216, 290);
             this.lst_serverlist.TabIndex = 8;
@@ -117,7 +90,7 @@
             // 
             // btn_exitServer
             // 
-            this.btn_exitServer.Location = new System.Drawing.Point(388, 370);
+            this.btn_exitServer.Location = new System.Drawing.Point(247, 321);
             this.btn_exitServer.Name = "btn_exitServer";
             this.btn_exitServer.Size = new System.Drawing.Size(75, 23);
             this.btn_exitServer.TabIndex = 9;
@@ -125,18 +98,35 @@
             this.btn_exitServer.UseVisualStyleBackColor = true;
             this.btn_exitServer.Click += new System.EventHandler(this.btn_exitServer_Click);
             // 
+            // lb_port
+            // 
+            this.lb_port.AutoSize = true;
+            this.lb_port.Location = new System.Drawing.Point(12, 363);
+            this.lb_port.Name = "lb_port";
+            this.lb_port.Size = new System.Drawing.Size(66, 13);
+            this.lb_port.TabIndex = 10;
+            this.lb_port.Text = "Current Port:";
+            // 
+            // lbn_port1
+            // 
+            this.lbn_port1.AutoSize = true;
+            this.lbn_port1.Location = new System.Drawing.Point(84, 363);
+            this.lbn_port1.Name = "lbn_port1";
+            this.lbn_port1.Size = new System.Drawing.Size(13, 13);
+            this.lbn_port1.TabIndex = 11;
+            this.lbn_port1.Text = "0";
+            // 
             // ServerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(501, 405);
+            this.ClientSize = new System.Drawing.Size(488, 385);
+            this.Controls.Add(this.lbn_port1);
+            this.Controls.Add(this.lb_port);
             this.Controls.Add(this.btn_exitServer);
             this.Controls.Add(this.lst_serverlist);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.portbox);
-            this.Controls.Add(this.portbtn);
             this.Controls.Add(this.btn_connClient);
             this.Controls.Add(this.textBox1);
             this.Name = "ServerForm";
@@ -150,14 +140,13 @@
 
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.Button btn_connClient;
-        private System.Windows.Forms.Button portbtn;
-        private System.Windows.Forms.TextBox portbox;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ListBox lst_serverlist;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.Button btn_exitServer;
+        private System.Windows.Forms.Label lb_port;
+        private System.Windows.Forms.Label lbn_port1;
     }
 }
 
