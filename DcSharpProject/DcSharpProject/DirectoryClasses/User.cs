@@ -30,7 +30,24 @@ namespace DcSharpProject
             rawDirData.Seek(0, SeekOrigin.Begin);
             SharedFiles = (Directory)formatter.Deserialize(rawDirData);
         }
-
+        public dirFile getFile(string URL)
+        {
+            dirFile output = null;
+            for (int i = 0; i < SharedFiles.folders.Count; i++)
+            {
+                for(int j = 0; j < SharedFiles.folders[i].files.Count; j++)
+                {
+                    if (URL.CompareTo(SharedFiles.folders[i].files[j].URL) == 0)
+                    {
+                        output = SharedFiles.folders[i].files[j];
+                        break;
+                    }
+                }
+                if (output != null)
+                    break;
+            }
+            return output;
+        }
         public MemoryStream getDirectoryData()
         {
             BinaryFormatter formatter = new BinaryFormatter();

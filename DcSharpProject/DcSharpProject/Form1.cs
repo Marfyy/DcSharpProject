@@ -227,6 +227,9 @@ namespace DcSharpProject
                     //receive file request with port
                     //Send ok back with filename, filesize
                     //start sending the file to given port
+                    string[] split = sOutput.Split(new char[] { '|' });
+                    string fileURL = split[1];
+                    int requestedPort = int.Parse(split[2]);
                 }
                 break;
             }

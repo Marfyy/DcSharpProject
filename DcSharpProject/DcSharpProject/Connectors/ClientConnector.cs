@@ -19,7 +19,12 @@ namespace DcSharpProject
         public string sendFileDownloadRequest(Client client, string fileRequested)
         {
             //Fixa så en port kommer med också
-            string sendMessage = "! " + fileRequested;
+            string sendMessage = "!|" + fileRequested;
+            return sendMessageReturn(client, sendMessage);
+        }
+        public string sendFileDownloadResponse(Client client, string message)
+        {
+            string sendMessage = "%" + message;
             return sendMessageReturn(client, sendMessage);
         }
         public string sendDirectoryRequest(Client client)
