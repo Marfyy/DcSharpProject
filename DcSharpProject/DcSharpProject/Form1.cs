@@ -254,14 +254,25 @@ namespace DcSharpProject
             updateDownloadList();
             portHandler.recyclePort(download.connectedClient.Port);
         }
+
+        //TESTKOD
         public void updateUploadList()
         {
-            
+            foreach (FileUpload fu in activeUploads)
+            {
+                lstUploads.Items.Add(fu).ToString();
+            }
         }
+        
+        //TESTKOD
         public void updateDownloadList()
         {
-            
+            foreach (FileDownload fd in activeDownloads)
+            {
+                lstDownloads.Items.Add(fd).ToString();
+            }
         }
+        
         private void btnConnect_Click(object sender, EventArgs e)
         {
 
