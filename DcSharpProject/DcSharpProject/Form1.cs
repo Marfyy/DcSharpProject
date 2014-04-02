@@ -255,7 +255,6 @@ namespace DcSharpProject
             portHandler.recyclePort(download.connectedClient.Port);
         }
 
-        //TESTKOD
         public void updateUploadList()
         {
             foreach (FileUpload fu in activeUploads)
@@ -264,7 +263,6 @@ namespace DcSharpProject
             }
         }
         
-        //TESTKOD
         public void updateDownloadList()
         {
             foreach (FileDownload fd in activeDownloads)
@@ -297,6 +295,7 @@ namespace DcSharpProject
                     connectedServers.Add(server); //adds the server to the internal connected serverlist
                     updateServerList(); //updates the server combobox with the new server
                     tabDC.SelectedIndex = 1; //changes the tab so that the serverpage shows
+                    cmbServer.Items.Add(server.Name);
                     cmbServer.SelectedIndex = connectedServers.Count - 1; //Changes the selected server in the combobox to the newly logged in server. This also promts SelectedIndexChanged method that loads the userlist
                 }
             }

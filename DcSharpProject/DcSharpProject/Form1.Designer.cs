@@ -227,6 +227,7 @@
             // 
             // cmbServer
             // 
+            this.cmbServer.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbServer.FormattingEnabled = true;
             this.cmbServer.Location = new System.Drawing.Point(83, 12);
             this.cmbServer.Name = "cmbServer";
