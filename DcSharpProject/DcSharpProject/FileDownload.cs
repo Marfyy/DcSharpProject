@@ -25,5 +25,15 @@ namespace DcSharpProject
         {
             this.done = true;
         }
+
+        //TESTKOD
+        public override string ToString()
+        {
+            
+            string downloads = string.Empty;
+            downloads = string.Format("{0,-8}{1,12}", file, done);
+
+            return downloads;
+        }
     }
 }

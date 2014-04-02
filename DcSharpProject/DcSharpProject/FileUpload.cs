@@ -22,5 +22,15 @@ namespace DcSharpProject
         {
             done = true;
         }
+        
+        // TESTKOD
+        public override string ToString()
+        {
+            
+            string uploads = string.Empty;
+            uploads = string.Format("{0,-8}{1,12}", file, done);
+
+            return uploads;
+        }
     }
 }
