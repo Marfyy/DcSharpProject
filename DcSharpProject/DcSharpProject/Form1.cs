@@ -34,6 +34,7 @@ namespace DcSharpProject
         bool listen = true;
         LoginForm login;
 
+        string downloadDirectory = Environment.SpecialFolder.MyDocuments.ToString();
         public Form1()
         {
             InitializeComponent();
@@ -82,6 +83,9 @@ namespace DcSharpProject
             //if (userNames != null)
             //    lstUser.Items.AddRange(userNames.ToArray());
         }
+        /// <summary>
+        /// initialized the GUI components
+        /// </summary>
         public void initGUI()
         {
             dirIconList.Images.Add(Image.FromFile(@"icons\usericon.png"));
@@ -107,6 +111,10 @@ namespace DcSharpProject
                 clientThread.Start(client);
             }
         }
+        /// <summary>
+        /// Catches the stream from a connected client or server, and reads the data
+        /// </summary>
+        /// <param name="client"></param>
         public void HandleClientConn(object client) //This method handels the incoming request messages from clients.
         {
             TcpClient tcpClient = (TcpClient)client; //New tcp client
@@ -179,6 +187,10 @@ namespace DcSharpProject
                 break;
             }
         }
+        /// <summary>
+        /// This method is placed in its own thread to send a file to another client
+        /// </summary>
+        /// <param name="fileUpload"></param>
         public void clientSendFile(object fileUpload)
         {
             FileUpload upload = (FileUpload)fileUpload;
@@ -194,11 +206,42 @@ namespace DcSharpProject
             }
             updateUploadList(); //Updates the upload list with the new status
         }
+        /// <summary>
+        /// This method is placed in a separate thread to receive the file from the stream, and placing it into the download directory
+        /// </summary>
+        /// <param name="fileDownload"></param>
         public void clientReceiveFile(object fileDownload)
         {
             FileDownload download = (FileDownload)fileDownload;
             activeDownloads.Add(download);
-
+            TcpListener listener = new TcpListener(IPAddress.Parse(download.connectedClient.IP), download.connectedClient.Port);
+            listener.Start();
+            TcpClient tcpClient = listener.AcceptTcpClient();
+            NetworkStream clientStream = tcpClient.GetStream();
+            FileStream fileStream = new FileStream(downloadDirectory + @"\" + download.file.Name, FileMode.Create);
+            clientStream.CopyTo(fileStream);
+            for (int i = 0; i < activeUploads.Count; i++) //Finds the upload amongst the active ones and marks it done
+            {
+                if (activeDownloads.ElementAt(i).file.realURL == download.file.realURL)
+                {
+                    activeDownloads.ElementAt(i).Done();
+                    break;
+                }
+            }
+            updateDownloadList();
+        }
+        public void clientSendDir(object networkStream)
+        {
+            
+        }
+        public void clientReceiveDir(object networkStream)
+        {
+            NetworkStream inStream = (NetworkStream)networkStream;
+            MemoryStream stream = new MemoryStream();
+            inStream.CopyTo(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+            selectedUser = new User(lstUser.SelectedItem.ToString());
+            selectedUser.updateDirectoryData(stream);
         }
         public void updateUploadList()
         {
@@ -208,11 +251,6 @@ namespace DcSharpProject
         {
             
         }
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void btnConnect_Click(object sender, EventArgs e)
         {
 
@@ -254,25 +292,6 @@ namespace DcSharpProject
 
 
         }
-        /// <summary>
-        /// tempuser
-        /// </summary>
-        private User CreateTempUser()
-        {
-            //Treeview icons
-            
-
-            //Creates temporary user with a made up filestructure
-            User user = new User("bajs");
-            List<Folder> folders = new List<Folder>();
-            folders.Add(new Folder("asdf1"));
-            folders.Add(new Folder("asdf2"));
-            //folders[0].addFile("fdsa1.jpg");
-            //folders[0].addFile("fdsa2.avi");
-            //folders[1].addFile("fdsa3.exe");
-            user.SharedFiles = new Directory(folders);
-            return user;
-        }
 
         private void importUserDirtoTreeview(User user)
         {
@@ -312,6 +331,11 @@ namespace DcSharpProject
             userDirTreeView.Nodes.Add(userNode);
         }
 
+        /// <summary>
+        /// this method automatically
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void lstUser_SelectedIndexChanged(object sender, EventArgs e)
         {
             string userName = (string)lstUser.SelectedItem;
@@ -321,13 +345,10 @@ namespace DcSharpProject
             {
                 string[] split = serverResponse.Split(new char[] { '|' });
                 clientToConnect = new Client(split[1], int.Parse(split[2]));
-                NetworkStream clientRequestResponse = clientConn.sendDirectoryRequest(clientToConnect);
-                if(clientRequestResponse != null)
+                NetworkStream clientRequestStream = clientConn.sendDirectoryRequest(clientToConnect);
+                if(clientRequestStream != null)
                 {
-                    selectedUser = new User(lstUser.SelectedItem.ToString());
-                    MemoryStream stream = new MemoryStream();
-                    clientRequestResponse.CopyTo(stream);
-                    selectedUser.updateDirectoryData(stream);
+                    startDirDownloadListenerthread(clientRequestStream);
                 }
             }
             else if (serverResponse.StartsWith("@NOK"))
@@ -359,7 +380,7 @@ namespace DcSharpProject
                             FileDownload download = new FileDownload();
                             download.file.internalURL = split[1];
                             download.file.sizeMB = int.Parse(split[2]);
-
+                            startDownloadListenerThread(download);
                         }
                     }
 
@@ -373,9 +394,15 @@ namespace DcSharpProject
                 }
             }
         } 
+        private void startDirDownloadListenerthread(NetworkStream stream)
+        {
+            Thread dirDownloadListenerThread = new Thread(new ParameterizedThreadStart(clientReceiveDir));
+            dirDownloadListenerThread.Start();
+        }
         private void startDownloadListenerThread(FileDownload download)
         {
-            
+            Thread downloadListenerThread = new Thread(new ParameterizedThreadStart(clientReceiveFile));
+            downloadListenerThread.Start(download);
         }
     }
 }
