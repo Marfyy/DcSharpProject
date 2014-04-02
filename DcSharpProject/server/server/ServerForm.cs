@@ -190,6 +190,12 @@ namespace server
                         clientStream.Flush();
                     }
                 }
+                if (tmp[0] == "+") //heartbeat from client, sends an ok message back.
+                {
+                    okBuff = encoder.GetBytes(okMess);
+                    clientStream.Write(okBuff, 0, okBuff.Length);
+                    clientStream.Flush();
+                }
                 if (tmp[0] == "%")
                 {
                     //Send list of clients to user.
