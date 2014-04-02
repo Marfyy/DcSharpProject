@@ -8,13 +8,13 @@ namespace DcSharpProject
 {
     class FileUpload
     {
-        public string fileURL { get; set; }
+        public dirFile file { get; set; }
         public Client connectedClient { get; set; }
         public bool done { get; set; }
         public FileUpload() { }
-        public FileUpload(string url, Client client)
+        public FileUpload(dirFile file, Client client)
         {
-            fileURL = url;
+            this.file = file;
             connectedClient = client;
             done = false;
         }

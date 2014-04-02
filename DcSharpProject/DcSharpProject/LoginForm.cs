@@ -12,7 +12,8 @@ namespace DcSharpProject
 {
     public partial class LoginForm : Form
     {
-        Server connectionserver { get; set; }
+        public Server connectionserver { get; set; }
+        public bool status { get; set; }
 
         public LoginForm()
         {
@@ -26,6 +27,7 @@ namespace DcSharpProject
 
         private void btnRegister_Click(object sender, EventArgs e)
         {
+            
             if (string.IsNullOrEmpty(txtBoxLoginIP.Text) || string.IsNullOrEmpty(txtBoxLoginName.Text) || string.IsNullOrEmpty(txtBoxLoginPass.Text) || string.IsNullOrEmpty(txtBoxLoginPort.Text))
             {
                 MessageBox.Show("Please fill out your information correctly", "Error",
@@ -35,6 +37,7 @@ namespace DcSharpProject
             {
                 this.connectionserver = new Server(" ", txtBoxLoginIP.Text, int.Parse(txtBoxLoginPort.Text), txtBoxLoginName.Text, txtBoxLoginPass.Text);
                 this.Close();
+                this.status = false;
             }
         }
 
@@ -49,6 +52,7 @@ namespace DcSharpProject
             {
                 this.connectionserver = new Server(" ", txtBoxLoginIP.Text, int.Parse(txtBoxLoginPort.Text), txtBoxLoginName.Text, txtBoxLoginPass.Text);
                 this.Close();
+                this.status = true;
             }
         }
 

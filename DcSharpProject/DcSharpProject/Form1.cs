@@ -107,66 +107,6 @@ namespace DcSharpProject
                 clientThread.Start(client);
             }
         }
-
-        public void HandleUserDirectoryData(object client)
-        {
-            TcpClient tcpClient = (TcpClient)client; //New tcp client
-            NetworkStream clientStream = tcpClient.GetStream(); //new networkstream
-            MemoryStream stream = new MemoryStream();
-            clientStream.CopyTo(stream);
-            connectedServers[cmbServer.SelectedIndex].users[lstUser.SelectedIndex].updateDirectoryData(stream);
-            importUserDirtoTreeview(connectedServers[cmbServer.SelectedIndex].users[lstUser.SelectedIndex]);
-
-            ////If we've been passed an unhelpful initial length, just
-            ////use 32K.
-            //byte[] buffer = new byte[tcpClient.ReceiveBufferSize];
-            //int read = 0;
-            //bool done = false;
-            //int chunk;
-            //byte[] output;
-            //string message;
-            //while ((chunk = clientStream.Read(buffer, read, buffer.Length - read)) > 0)
-            //{
-            //    read += chunk;
-            //    // If we've reached the end of our buffer, check to see if there's
-            //    // any more information
-            //    if (read == buffer.Length)
-            //    {
-            //        int nextByte = clientStream.ReadByte();
-
-            //        // End of stream? If so, we're done
-            //        if (nextByte == -1)
-            //        {
-            //            done = true;
-            //            output = buffer;
-            //            break;
-            //        }
-
-            //        // Nope. Resize the buffer, put in the byte we've just
-            //        // read, and continue
-            //        byte[] newBuffer = new byte[buffer.Length * 2];
-            //        Array.Copy(buffer, newBuffer, buffer.Length);
-            //        newBuffer[read] = (byte)nextByte;
-            //        buffer = newBuffer;
-            //        read++;
-            //    }
-            //    //Buffer is now too big. Shrink it.
-            //    output = new byte[read];
-            //    Array.Copy(buffer, output, read);
-            //    message = Encoding.Default.GetString(output);
-
-            //    tcpClient.Close();
-            //    break;
-            //}
-            //if(message != null)
-            //{
-                
-            //}
-        }
-        public void HandleFileDownloadData(object client)
-        {
-            
-        }
         public void HandleClientConn(object client) //This method handels the incoming request messages from clients.
         {
             TcpClient tcpClient = (TcpClient)client; //New tcp client
@@ -231,7 +171,7 @@ namespace DcSharpProject
                         clientConn.sendFileDownloadResponse(tcpClient, message); //Send back OK
 
                         Thread fileTransferThread = new Thread(new ParameterizedThreadStart(clientSendFile));
-                        FileUpload upload = new FileUpload(file.internalURL, sendClient);
+                        FileUpload upload = new FileUpload(file, sendClient);
                         fileTransferThread.Start(upload);
                         
                     }
@@ -243,16 +183,22 @@ namespace DcSharpProject
         {
             FileUpload upload = (FileUpload)fileUpload;
             activeUploads.Add(upload);
-            clientConn.sendFile(upload.fileURL, 0, upload.connectedClient); //Send file
+            clientConn.sendFile(upload.file.realURL, 0, upload.connectedClient); //Send file
             for(int i = 0; i < activeUploads.Count; i++) //Finds the upload amongst the active ones and marks it done
             {
-                if (activeUploads.ElementAt(i).fileURL == upload.fileURL)
+                if (activeUploads.ElementAt(i).file.realURL == upload.file.realURL)
                 {
                     activeUploads.ElementAt(i).Done();
                     break;
                 }
             }
             updateUploadList(); //Updates the upload list with the new status
+        }
+        public void clientReceiveFile(object fileDownload)
+        {
+            FileDownload download = (FileDownload)fileDownload;
+            activeDownloads.Add(download);
+
         }
         public void updateUploadList()
         {
@@ -397,7 +343,7 @@ namespace DcSharpProject
             {
                 string url = userDirTreeView.SelectedNode.Parent.Text + "\\" + userDirTreeView.SelectedNode.Text;
                 string userName = (string)lstUser.SelectedItem;
-                string serverResponse = serverConn.getUserConnInfo(connectedServers[cmbServer.SelectedIndex], userName);
+                string serverResponse = serverConn.getUserConnInfo(connectedServers[cmbServer.SelectedIndex], userName); //Gets ip and port from server
                 Client clientToConnect;
                 int port = portHandler.getPort();
                 if (serverResponse.StartsWith("@OK"))
@@ -413,6 +359,7 @@ namespace DcSharpProject
                             FileDownload download = new FileDownload();
                             download.file.internalURL = split[1];
                             download.file.sizeMB = int.Parse(split[2]);
+
                         }
                     }
 
@@ -426,6 +373,10 @@ namespace DcSharpProject
                 }
             }
         } 
+        private void startDownloadListenerThread(FileDownload download)
+        {
+            
+        }
     }
 }
 

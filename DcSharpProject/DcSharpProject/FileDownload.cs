@@ -8,7 +8,22 @@ namespace DcSharpProject
 {
     class FileDownload
     {
-        public string fileURL { get; set; }
         public dirFile file { get; set; }
+        public string fileURL { get; set; }
+        public Client connectedClient { get; set; }
+        public bool done { get; set; }
+        public FileDownload()
+        {
+            
+        }
+        public FileDownload(dirFile file, Client client)
+        {
+            this.file = file;
+            this.connectedClient = client;
+        }
+        public void Done()
+        {
+            this.done = true;
+        }
     }
 }
