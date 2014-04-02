@@ -27,6 +27,7 @@ namespace server
         private TcpListener tcpListener = new TcpListener(IPAddress.Any,9999); //A tcplistener.
         private Thread listenThread; //A listenthread
         private Thread heartbeatThread;
+        
         string username;
         int port;
         string ip = "10.1.1.114";
@@ -34,10 +35,11 @@ namespace server
         public ServerForm()
         {
             InitializeComponent();
+            var UserList = @"UserListXML.xml";
             IPEndPoint endpoint = new IPEndPoint(IPAddress.Parse("123123"), 9979);
-            klienter.Add("Marreman", endpoint);
-            users.Add("markus", "hejsan123");
-            users.Add("martin", "hejsan321");
+            var xdoc = XDocument.Load(UserList);
+            users = xdoc.Descendants("user").ToDictionary(d => (string)d.Attribute("Username").Value,
+                                                           d => (string)d.Attribute("Password").Value);
             getservers();
             SetPort(ip, 9999);
             timer1.Interval = 19000;
@@ -149,22 +151,25 @@ namespace server
                 {
                     if (!users.ContainsKey(tmp[1]) && !users.ContainsValue(tmp[2]))
                     {
-                        var UserList = @"UserListXML.xml";
-                        var newUser = new XElement("user");
-                        newUser.SetAttributeValue("Username", tmp[1]);
-                        newUser.SetAttributeValue("Password", tmp[2]);
-                        var document = XDocument.Load(UserList);
-                        var Users = document.Element("users");
-                        Users.Add(newUser);
-                        File.WriteAllText(UserList, document.ToString());
-                        document.Save(UserList);
-                        var xdoc = XDocument.Load(UserList);
-                        users = xdoc.Descendants("users").ToDictionary(d => (string)d.Attribute("Username").Value,
-                                                                       d=>(string)d);
-                       // users.Add(tmp[1], tmp[2]);
-                        okBuff = encoder.GetBytes(okMess);
-                        clientStream.Write(okBuff, 0, okBuff.Length);
-                        clientStream.Flush();
+                        if (tmp[1] != null && tmp[2] != null)
+                        {
+                            var UserList = @"UserListXML.xml";
+                            var newUser = new XElement("user");
+                            newUser.SetAttributeValue("Username", tmp[1]);
+                            newUser.SetAttributeValue("Password", tmp[2]);
+                            var document = XDocument.Load(UserList);
+                            var Users = document.Element("users");
+                            Users.Add(newUser);
+                            File.WriteAllText(UserList, document.ToString());
+                            document.Save(UserList);
+                            var xdoc = XDocument.Load(UserList);
+                            users = xdoc.Descendants("user").ToDictionary(d => (string)d.Attribute("Username").Value,
+                                                                           d => (string)d.Attribute("Password").Value);
+                            // users.Add(tmp[1], tmp[2]);
+                            okBuff = encoder.GetBytes(okMess);
+                            clientStream.Write(okBuff, 0, okBuff.Length);
+                            clientStream.Flush();
+                        }
                     }
                     else
                     {
@@ -259,7 +264,7 @@ namespace server
                 client.Connect(_HostURI,_PortNumber);
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //MessageBox.Show("Error pinging host:'" + _HostURI + ":" + _PortNumber.ToString() + "'");
                 
