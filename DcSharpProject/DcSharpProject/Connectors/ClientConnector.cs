@@ -135,14 +135,6 @@ namespace DcSharpProject
                 byte[] bMessage = encoder.GetBytes(sendMessage);
                 stream.Write(bMessage, 0, bMessage.Length);
                 stream.Flush();
-
-                //RECIEVE RESPONSE FROM SERVER
-                listener.Start();
-                Thread timeoutThread = new Thread(new ThreadStart(AuthenticationTimeout)); //Makes the client wait 10 seconds for the server to respond to the message, else abort
-                timeoutThread.Start();
-                server = listener.AcceptTcpClient();
-                timeoutThread.Abort();
-                stream = server.GetStream();
                 return stream;
             }
             catch (Exception)

@@ -23,15 +23,15 @@ namespace server
     {
         bool listen = true; //a bool for the listener.
         Dictionary<string, string> users = new Dictionary<string, string>(); //the dictionary with the registered users. (username, password).
-        Dictionary<string, IPEndPoint> klienter = new Dictionary<string, IPEndPoint>(); //the dictionary containing users that are logged in. (username, ipendpoint).
+        Dictionary<string, string> klienter = new Dictionary<string, string>(); //the dictionary containing users that are logged in. (username, ipaddress).
         private TcpListener tcpListener = new TcpListener(IPAddress.Any,9999); //A new instance of a tcplistener that listenes to any ip on port 9999.
         private Thread listenThread; //A thread dedicated for the listener.
         private Thread heartbeatThread; //A thread dedicated for the heartbeat method.
         
         string username; //String containing username.
         int port; // String Containing Port.
-        string ip = "10.1.1.114"; // Hardcoded port for our server. (Can be changed)
-
+        //string ip = "10.1.1.114"; // Hardcoded port for our server. (Can be changed)
+        string ip = "127.0.0.1"; // Hardcoded port for our server. (Can be changed)
         public ServerForm()
         {
             InitializeComponent();
@@ -128,9 +128,9 @@ namespace server
 
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2])) // if the dictionary users already contain the username and password.
                     {
-                        if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient)) //If klienter doesnt have the username and password, it adds it.
+                        if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient.Address.ToString())) //If klienter doesnt have the username and password, it adds it.
                         {
-                            klienter.Add(tmp[1], connectedClient);
+                            klienter.Add(tmp[1], connectedClient.Address.ToString());
                             okBuff = encoder.GetBytes(okMess);
                             clientStream.Write(okBuff, 0, okBuff.Length);
                             clientStream.Flush();
@@ -141,6 +141,12 @@ namespace server
                             clientStream.Write(nokBuff, 0, nokBuff.Length);
                             clientStream.Flush();
                         }
+                    }
+                    else
+                    {
+                        nokBuff = encoder.GetBytes(nOk);
+                        clientStream.Write(nokBuff, 0, nokBuff.Length);
+                        clientStream.Flush();
                     }
                 }
                 if (tmp[0] == "#") // Register
@@ -165,6 +171,12 @@ namespace server
                             clientStream.Write(okBuff, 0, okBuff.Length);
                             clientStream.Flush();
                         }
+                        else
+                        {
+                            nokBuff = encoder.GetBytes(nOk);
+                            clientStream.Write(nokBuff, 0, nokBuff.Length);
+                            clientStream.Flush();
+                        }
                     }
                     else
                     {
@@ -175,9 +187,9 @@ namespace server
                 }
                 if (tmp[0] == ",") // Send klients to servers.
                 {
-                    if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient))
+                    if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient.Address.ToString()))
                     {
-                        klienter.Add(tmp[1], connectedClient);
+                        klienter.Add(tmp[1], connectedClient.Address.ToString());
                     }
                 }
                 if (tmp[0] == "!")//Log out.
@@ -201,7 +213,7 @@ namespace server
                     //Send list of clients to user.
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
                     {
-                        if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient))
+                        if (klienter.ContainsKey(tmp[1]) && klienter.ContainsValue(connectedClient.Address.ToString()))
                         {
                             List<string> userNames = klienter.Keys.ToList<string>();
                             BinaryFormatter formatter = new BinaryFormatter();
@@ -218,17 +230,17 @@ namespace server
                         }
                     }
 
-                } if (tmp[0] == "@")//Get users ip and port.
+                } if (tmp[0] == "@")//Get users ip.
                 {
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
                     {
-                        if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient))
+                        if (klienter.ContainsKey(tmp[1]) && klienter.ContainsValue(connectedClient.Address.ToString()))
                         {
                             string endpoint = "";
                             for (int i = 0; i < klienter.Count; i++)
                             {
                                 if (klienter.Keys.ElementAt(i) == tmp[3])
-                                    endpoint = klienter.Values.ElementAt(i).Address + "|" + klienter.Values.ElementAt(i).Port;
+                                    endpoint = klienter.Values.ElementAt(i);
                             }
                             if (endpoint.CompareTo(String.Empty) == 0)
                             {

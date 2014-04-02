@@ -34,11 +34,12 @@ namespace DcSharpProject
         bool listen = true;
         LoginForm login;
 
-        string downloadDirectory = Environment.SpecialFolder.MyDocuments.ToString();
+        string downloadDirectory = @"C:\Downloads";
         public Form1()
         {
             InitializeComponent();
             initGUI();
+            connectedServers = new List<Server>();
             activeUploads = new List<FileUpload>();
             activeDownloads = new List<FileDownload>();
             XmlDocument xml = new XmlDocument();
@@ -111,8 +112,29 @@ namespace DcSharpProject
                 clientThread.Start(client);
             }
         }
+        public void startHeartbeatThread(Server server)
+        {
+            Thread heartbeatThread = new Thread(new ParameterizedThreadStart(serverHeartbeat));
+            heartbeatThread.Start(server);
+        }
         /// <summary>
-        /// Catches the stream from a connected client or server, and reads the data
+        /// this method sends out a heartbeat every 60 seconds to all connected servers
+        /// </summary>
+        /// <param name="server"></param>
+        public void serverHeartbeat(object server)
+        {
+            Server connectedServer = (Server)server;
+            
+            while(true)
+            {
+                string response = serverConn.sendHeartbeat(connectedServer);
+                if (response.StartsWith("+NOK"))
+                    MessageBox.Show("Connection problem to server " + connectedServer.Name + " detected.");
+                Thread.Sleep(60000);
+            }
+        }
+        /// <summary>
+        /// Catches the stream from a connected client or server, and reads the data. The port this method uses is used by the client to request directory and file downloads.
         /// </summary>
         /// <param name="client"></param>
         public void HandleClientConn(object client) //This method handels the incoming request messages from clients.
@@ -156,13 +178,13 @@ namespace DcSharpProject
                 //Buffer is now too big. Shrink it.
                 output = new byte[read];
                 Array.Copy(buffer, output, read);              
-                tcpClient.Close();
+                
                 string sOutput = Encoding.ASCII.GetString(output);
-                if(sOutput.StartsWith("!")) //Request dir info
+                if(sOutput.StartsWith("@")) //Request dir info
                 {
                     clientConn.sendUserDirectory(self, tcpClient);
                 }
-                else if(sOutput.StartsWith("@")) //Request file download
+                else if(sOutput.StartsWith("!")) //Request file download
                 {
                     //receive file request with port
                     //Send ok back with filename, filesize
@@ -184,6 +206,7 @@ namespace DcSharpProject
                         
                     }
                 }
+                tcpClient.Close();
                 break;
             }
         }
@@ -229,19 +252,7 @@ namespace DcSharpProject
                 }
             }
             updateDownloadList();
-        }
-        public void clientSendDir(object networkStream)
-        {
-            
-        }
-        public void clientReceiveDir(object networkStream)
-        {
-            NetworkStream inStream = (NetworkStream)networkStream;
-            MemoryStream stream = new MemoryStream();
-            inStream.CopyTo(stream);
-            stream.Seek(0, SeekOrigin.Begin);
-            selectedUser = new User(lstUser.SelectedItem.ToString());
-            selectedUser.updateDirectoryData(stream);
+            portHandler.recyclePort(download.connectedClient.Port);
         }
         public void updateUploadList()
         {
@@ -256,22 +267,29 @@ namespace DcSharpProject
 
             login.ShowDialog();
 
-            if (login.status)
+            if (login.status) //If it was a login action
             {
                 Server server = login.getserver();
                 string serverMessage = serverConn.loginToServer(server);
-                if (serverMessage == "Connection failure")
+                if (serverMessage == "Connection failure") //Server could not be reached
                 {
                     MessageBox.Show("Could not connect to server", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                if (serverMessage == "@NOK")
+                else if (serverMessage == "$NOK") //Server was reached, but sent back a negative response
                 {
                     MessageBox.Show("Login information is not correct", "Error",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+                else //Connect successful
+                {
+                    connectedServers.Add(server); //adds the server to the internal connected serverlist
+                    updateServerList(); //updates the server combobox with the new server
+                    tabDC.SelectedIndex = 1; //changes the tab so that the serverpage shows
+                    cmbServer.SelectedIndex = connectedServers.Count - 1; //Changes the selected server in the combobox to the newly logged in server. This also promts SelectedIndexChanged method that loads the userlist
+                }
             }
-            else if(login.status == false)
+            else if(login.status == false) //else if it was a register action
             {
                 Server server = login.getserver();
                 string serverMessage = serverConn.registerToServer(server);
@@ -286,13 +304,17 @@ namespace DcSharpProject
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            
-
-
-
-
         }
-
+        private void updateServerList()
+        {
+            cmbServer.Items.Clear();
+            string[] connectedServerNames = new string[connectedServers.Count];
+            for(int i = 0; i < connectedServerNames.Length; i++)
+            {
+                connectedServerNames[i] = connectedServers[i].Name;
+            }
+            cmbServer.Items.AddRange(connectedServerNames);
+        }
         private void importUserDirtoTreeview(User user)
         {
             int nrOfFolders = user.SharedFiles.folders.Count;
@@ -344,11 +366,16 @@ namespace DcSharpProject
             if (serverResponse.StartsWith("@OK"))
             {
                 string[] split = serverResponse.Split(new char[] { '|' });
-                clientToConnect = new Client(split[1], int.Parse(split[2]));
+                clientToConnect = new Client(split[1], portHandler.clientRequestPort);
                 NetworkStream clientRequestStream = clientConn.sendDirectoryRequest(clientToConnect);
                 if(clientRequestStream != null)
                 {
-                    startDirDownloadListenerthread(clientRequestStream);
+                    MemoryStream stream = new MemoryStream();
+                    clientRequestStream.CopyTo(stream);
+                    stream.Seek(0, SeekOrigin.Begin);
+                    selectedUser = new User(lstUser.SelectedItem.ToString());
+                    selectedUser.updateDirectoryData(stream);
+                    importUserDirtoTreeview(selectedUser);
                 }
             }
             else if (serverResponse.StartsWith("@NOK"))
@@ -364,13 +391,14 @@ namespace DcSharpProject
             {
                 string url = userDirTreeView.SelectedNode.Parent.Text + "\\" + userDirTreeView.SelectedNode.Text;
                 string userName = (string)lstUser.SelectedItem;
-                string serverResponse = serverConn.getUserConnInfo(connectedServers[cmbServer.SelectedIndex], userName); //Gets ip and port from server
+                string serverResponse = serverConn.getUserConnInfo(connectedServers[cmbServer.SelectedIndex], userName); //Gets ip from server
                 Client clientToConnect;
                 int port = portHandler.getPort();
                 if (serverResponse.StartsWith("@OK"))
                 {
                     string[] split = serverResponse.Split(new char[] { '|' });
-                    clientToConnect = new Client(split[1], int.Parse(split[2]));
+                    string clientIP = split[1];
+                    clientToConnect = new Client(clientIP, portHandler.clientRequestPort);
                     string clientRequestResponse = clientConn.sendFileDownloadRequest(clientToConnect, url, port);
                     if (clientRequestResponse.CompareTo("Connection failed") != 0)
                     {
@@ -378,13 +406,14 @@ namespace DcSharpProject
                         {
                             split = clientRequestResponse.Split(new char[] { '|' });
                             FileDownload download = new FileDownload();
+                            download.connectedClient = new Client(clientIP, port);
                             download.file.internalURL = split[1];
                             download.file.sizeMB = int.Parse(split[2]);
                             startDownloadListenerThread(download);
                         }
                     }
 
-                    portHandler.recyclePort(port);
+                    
                 }
                 else if (serverResponse.StartsWith("@NOK"))
                     MessageBox.Show("That user does not exist");
@@ -394,15 +423,25 @@ namespace DcSharpProject
                 }
             }
         } 
-        private void startDirDownloadListenerthread(NetworkStream stream)
-        {
-            Thread dirDownloadListenerThread = new Thread(new ParameterizedThreadStart(clientReceiveDir));
-            dirDownloadListenerThread.Start();
-        }
         private void startDownloadListenerThread(FileDownload download)
         {
             Thread downloadListenerThread = new Thread(new ParameterizedThreadStart(clientReceiveFile));
             downloadListenerThread.Start(download);
+        }
+
+        private void cmbServer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            List<string> users = serverConn.getCompleteUserListFromServer(connectedServers[cmbServer.SelectedIndex]);
+            lstUser.Items.AddRange(users.ToArray());
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            for(int i = 0; i < connectedServers.Count; i++)
+            {
+                serverConn.logoutFromServer(connectedServers[i]);
+            }
+            
         }
     }
 }

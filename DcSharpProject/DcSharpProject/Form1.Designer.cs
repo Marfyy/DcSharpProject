@@ -232,6 +232,7 @@
             this.cmbServer.Name = "cmbServer";
             this.cmbServer.Size = new System.Drawing.Size(888, 21);
             this.cmbServer.TabIndex = 7;
+            this.cmbServer.SelectedIndexChanged += new System.EventHandler(this.cmbServer_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -343,6 +344,7 @@
             this.Controls.Add(this.tabDC);
             this.Name = "Form1";
             this.Text = "Form1";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.tabDownloads.ResumeLayout(false);
             this.tabDownloads.PerformLayout();
             this.tabUser.ResumeLayout(false);

@@ -10,8 +10,8 @@ namespace DcSharpProject
     {
         public int clientRequestPort = 9000;
         public int serverRequestPort = 9999;
-        public int clientDataPortMin = 9001;
-        public int clientDataPortMax = 9998;
+        public int clientDataPortMin = 10001;
+        public int clientDataPortMax = 10998;
         private List<int> ports;
         private List<int> usedPorts;
         public PortHandler()

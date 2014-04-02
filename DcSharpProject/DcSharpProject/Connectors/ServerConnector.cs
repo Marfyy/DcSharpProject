@@ -169,20 +169,17 @@ namespace DcSharpProject
                 BinaryFormatter formatter = new BinaryFormatter();
                 userNames = new List<string>();
                 userNames = (List<string>)formatter.Deserialize(stream);
-                //while(true)
-                //{
-                //    if(stream.DataAvailable)
-                //    {
-                //        stream.CopyTo(outputStream);
-                //        break;
-                //    }
-                //}
             }
             catch (Exception)
             {
                 return null;
             }
             return userNames;
+        }
+        public string sendServerHeartbeat(Server serverToConnect)
+        {
+            string sendMessage = "+|" + serverToConnect.UserName + "|" + serverToConnect.Password;
+            return sendMessageReturn(serverToConnect, sendMessage);
         }
         /// <summary>
         /// Creates a 10 second delay, then terminates the listener. Used for ack packages from server
