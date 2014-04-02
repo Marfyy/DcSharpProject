@@ -149,7 +149,19 @@ namespace server
                 {
                     if (!users.ContainsKey(tmp[1]) && !users.ContainsValue(tmp[2]))
                     {
-                        users.Add(tmp[1], tmp[2]);
+                        var UserList = @"UserListXML.xml";
+                        var newUser = new XElement("user");
+                        newUser.SetAttributeValue("Username", tmp[1]);
+                        newUser.SetAttributeValue("Password", tmp[2]);
+                        var document = XDocument.Load(UserList);
+                        var Users = document.Element("users");
+                        Users.Add(newUser);
+                        File.WriteAllText(UserList, document.ToString());
+                        document.Save(UserList);
+                        var xdoc = XDocument.Load(UserList);
+                        users = xdoc.Descendants("users").ToDictionary(d => (string)d.Attribute("Username").Value,
+                                                                       d=>(string)d);
+                       // users.Add(tmp[1], tmp[2]);
                         okBuff = encoder.GetBytes(okMess);
                         clientStream.Write(okBuff, 0, okBuff.Length);
                         clientStream.Flush();
@@ -276,7 +288,8 @@ namespace server
                         Debug.WriteLine("My port is " + port + ", switching to " + item);
                         port = item;
                         //listenThread.Abort();
-                        connect(port);                       
+                        connect(port);
+                      
                     }
                 }
 
@@ -298,6 +311,8 @@ namespace server
 
             heartbeatThread.Abort();
         }
+
+
 
         private void btn_connClient_Click(object sender, EventArgs e)
         {
