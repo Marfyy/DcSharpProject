@@ -78,7 +78,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="UserListXML.xml" />
+    <Content Include="UserListXML.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="XMLFile1.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

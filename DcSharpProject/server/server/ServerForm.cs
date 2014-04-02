@@ -21,32 +21,32 @@ namespace server
 {
     public partial class ServerForm : Form
     {
-        bool listen = true;
-        Dictionary<string, string> users = new Dictionary<string, string>();
-        Dictionary<string, IPEndPoint> klienter = new Dictionary<string, IPEndPoint>();
-        private TcpListener tcpListener = new TcpListener(IPAddress.Any,9999); //A tcplistener.
-        private Thread listenThread; //A listenthread
-        private Thread heartbeatThread;
+        bool listen = true; //a bool for the listener.
+        Dictionary<string, string> users = new Dictionary<string, string>(); //the dictionary with the registered users. (username, password).
+        Dictionary<string, IPEndPoint> klienter = new Dictionary<string, IPEndPoint>(); //the dictionary containing users that are logged in. (username, ipendpoint).
+        private TcpListener tcpListener = new TcpListener(IPAddress.Any,9999); //A new instance of a tcplistener that listenes to any ip on port 9999.
+        private Thread listenThread; //A thread dedicated for the listener.
+        private Thread heartbeatThread; //A thread dedicated for the heartbeat method.
         
-        string username;
-        int port;
-        string ip = "10.1.1.114";
+        string username; //String containing username.
+        int port; // String Containing Port.
+        string ip = "10.1.1.114"; // Hardcoded port for our server. (Can be changed)
 
         public ServerForm()
         {
             InitializeComponent();
-            var UserList = @"UserListXML.xml";
-            IPEndPoint endpoint = new IPEndPoint(IPAddress.Parse("123123"), 9979);
-            var xdoc = XDocument.Load(UserList);
+            var UserList = @"UserListXML.xml"; //List of users in XML document that later binds with the dictionary.
+            IPEndPoint endpoint = new IPEndPoint(IPAddress.Parse("123123"), 9979); //Test ip endpoint used in project.
+            var xdoc = XDocument.Load(UserList); //Loads the XML document containing users.
             users = xdoc.Descendants("user").ToDictionary(d => (string)d.Attribute("Username").Value,
-                                                           d => (string)d.Attribute("Password").Value);
-            getservers();
-            SetPort(ip, 9999);
-            timer1.Interval = 19000;
-            timer1.Start();
+                                                           d => (string)d.Attribute("Password").Value); //Gets all the users from XMl document and puts them in dictionary.
+            getservers(); //Calls for a method that loads all the other servers from XML document.
+            SetPort(ip, 9999); //Calls for method that sets the port. It tries port 9999 at first.
+            timer1.Interval = 19000; //A timer interval for the heartbeat method.
+            timer1.Start(); //Starts the timer.
         }
 
-        public void SetPort(string ip, int port1)
+        public void SetPort(string ip, int port1) //A method that sets the port from 9999-9995. It tries from high to low.
         {
             if(PingHost(ip,port1))
             {
@@ -117,24 +117,20 @@ namespace server
 
                 //message has successfully been received
                 ASCIIEncoding encoder = new ASCIIEncoding();
-                username = (encoder.GetString(message, 0, bytesRead));
-                string[] tmp = username.Split('|');
-                string okMess = tmp[0] + "OK";
-                byte[] okBuff;
-                string nOk = tmp[0] + "NOK";
-                byte[] nokBuff;
-                if (tmp[0] == "$") // Logga in
+                username = (encoder.GetString(message, 0, bytesRead)); //gets the message.
+                string[] tmp = username.Split('|'); //splits the message and splits it on |. 
+                string okMess = tmp[0] + "OK"; //Premade confirmation message.
+                byte[] okBuff; //premade confirmation buff.
+                string nOk = tmp[0] + "NOK"; //Premade denial message.
+                byte[] nokBuff; //Premade denial message.
+                if (tmp[0] == "$") // Log in
                 {
 
-                    if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
+                    if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2])) // if the dictionary users already contain the username and password.
                     {
-                        if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient))
+                        if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient)) //If klienter doesnt have the username and password, it adds it.
                         {
                             klienter.Add(tmp[1], connectedClient);
-                            // string result = string.Join(", ", klienter.Select(x => string.Format("{0} : {1}", x.Key, x.Value)).ToArray());
-                            // byte[] buffer = encoder.GetBytes(result); //a byte array to store the message in after it has been encoded.
-                            // clientStream.Write(buffer, 0, buffer.Length); //Sends the message to server
-                            //clientStream.Flush(); //Flushes the stream
                             okBuff = encoder.GetBytes(okMess);
                             clientStream.Write(okBuff, 0, okBuff.Length);
                             clientStream.Flush();
@@ -147,11 +143,11 @@ namespace server
                         }
                     }
                 }
-                if (tmp[0] == "#") // Bli medlem
+                if (tmp[0] == "#") // Register
                 {
-                    if (!users.ContainsKey(tmp[1]) && !users.ContainsValue(tmp[2]))
+                    if (!users.ContainsKey(tmp[1]) && !users.ContainsValue(tmp[2])) //if the users dictionary doesnt already contain username and password.
                     {
-                        if (tmp[1] != null && tmp[2] != null)
+                        if (tmp[1] != null && tmp[2] != null) //if username and password isnt null, it adds the values to XML doc and dictionary.
                         {
                             var UserList = @"UserListXML.xml";
                             var newUser = new XElement("user");
@@ -165,7 +161,6 @@ namespace server
                             var xdoc = XDocument.Load(UserList);
                             users = xdoc.Descendants("user").ToDictionary(d => (string)d.Attribute("Username").Value,
                                                                            d => (string)d.Attribute("Password").Value);
-                            // users.Add(tmp[1], tmp[2]);
                             okBuff = encoder.GetBytes(okMess);
                             clientStream.Write(okBuff, 0, okBuff.Length);
                             clientStream.Flush();
@@ -178,14 +173,14 @@ namespace server
                         clientStream.Flush();
                     }
                 }
-                if (tmp[0] == ",") // Skicka klientlistan till servrarna
+                if (tmp[0] == ",") // Send klients to servers.
                 {
                     if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient))
                     {
                         klienter.Add(tmp[1], connectedClient);
                     }
                 }
-                if (tmp[0] == "!")//Logga ut användaren
+                if (tmp[0] == "!")//Log out.
                 {
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
                     {
@@ -197,7 +192,7 @@ namespace server
                 }
                 if (tmp[0] == "%")
                 {
-                    //skicka lista över klienter till användaren...
+                    //Send list of clients to user.
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
                     {
                         if (!klienter.ContainsKey(tmp[1]) && !klienter.ContainsValue(connectedClient))
@@ -217,7 +212,7 @@ namespace server
                         }
                     }
 
-                } if (tmp[0] == "@")//hämta användares ip och port
+                } if (tmp[0] == "@")//Get users ip and port.
                 {
                     if (users.ContainsKey(tmp[1]) && users.ContainsValue(tmp[2]))
                     {
@@ -256,7 +251,7 @@ namespace server
                 tcpClient.Close();
             }
         }
-        public static bool PingHost(string _HostURI, int _PortNumber)
+        public static bool PingHost(string _HostURI, int _PortNumber) //checks if an ip with a specific port is available.
         {
             try
             {
@@ -266,13 +261,12 @@ namespace server
             }
             catch (Exception)
             {
-                //MessageBox.Show("Error pinging host:'" + _HostURI + ":" + _PortNumber.ToString() + "'");
                 
             }
             return false;
         }
 
-        public void heartbeat()
+        public void heartbeat() //Checks if other servers are online. Otherwise it takes it place if it contains a higher portnumber.
         {
             string ip = "10.1.1.114";
             XDocument xmldoc = XDocument.Load("XMLFile1.xml");
@@ -292,13 +286,12 @@ namespace server
                     {
                         Debug.WriteLine("My port is " + port + ", switching to " + item);
                         port = item;
-                        //listenThread.Abort();
                         connect(port);
                       
                     }
                 }
 
-                if(item < port)
+                if(item < port) //sends klients to servers with lower port.
                 {
                     bool resultPing = PingHost(ip, item);
                     if(resultPing)
@@ -333,7 +326,7 @@ namespace server
             this.listenThread.Start(); //Starts the listenerthread.
         }
 
-        private void getservers()
+        private void getservers() //Gets the servers from an XML document.
         {
             XDocument xmldoc = XDocument.Load("XMLFile1.xml");
             var items = (from i in xmldoc.Descendants("interface")
